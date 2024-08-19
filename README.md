@@ -49,9 +49,9 @@ $ pip install .
 
 The top level of the repository contains two demo notebooks. 
 
-The `demo_imaginary_data.ipynb` notebook works with imaginary news that you can type in or copy from somewhere. It loads our explainable model trained on the English MIND dataset and is probably the easiest entry point as it doesn't require any data pre-processing.
+The [demo_imaginary_data.ipynb](https://github.com/lucasmllr/xnrs/blob/main/demo_mind_data.ipynb) notebook works with imaginary news that you can type in or copy from somewhere. It loads our explainable model trained on the English MIND dataset and is probably the easiest entry point as it doesn't require any data pre-processing.
 
-The `demo_mind_data.ipynb` notebook loads the pre-processed MIND dataset and samples real reading sessions from its test set.
+The [demo_mind_data.ipynb](https://github.com/lucasmllr/xnrs/blob/main/demo_imaginary_data.ipynb) notebook loads the pre-processed MIND dataset and samples real reading sessions from its test set.
 To use this notebook you have to download the MIND dataset first and run the `xnrs.data.make_mind_dataset.py` script to pre-processes it including the pre-computation of transformer embeddings for the contained news. This will take a while.
 
 ### Model Weights
@@ -59,7 +59,7 @@ To use this notebook you have to download the MIND dataset first and run the `xn
 We provide the weights for two pre-trained models. Both use our standard architecture (details in Section 3.1 in the paper). You can download the checkpoints by clicking the below links or use the `xnrs.models.get_checkpoint()` method in code (as it is done in the demos):
 
 - [xnrs_mind](https://www2.ims.uni-stuttgart.de/data/xnrs/xnrs_mind_checkpoint.zip) is trained on the English MIND dataset.
-- [xnrs_adressa](https://www2.ims.uni-stuttgart.de/data/xnrs/xnrs_adresse_checkpoint.zip) is trained on the Norwegian Adressa dataset.
+- [xnrs_adressa](https://www2.ims.uni-stuttgart.de/data/xnrs/xnrs_adressa_checkpoint.zip) is trained on the Norwegian Adressa dataset.
 
 
 ### Datasets
@@ -72,7 +72,7 @@ The [Adressa](https://reclab.idi.ntnu.no/dataset/) dataset comes from the Norweg
 
 ### Training
 
-The `train.py` script runs a training for a configuration defined in a config.yaml file. Two exaples of config files for our standard archtiecture and both the MIND and Adressa dataset are included in the `configs/` directory.
+The [train.py](https://github.com/lucasmllr/xnrs/blob/main/train.py) script runs a training for a configuration defined in a config.yaml file. Two exaples of config files for our standard archtiecture and both the MIND and Adressa dataset are included in the `configs/` directory.
 Before starting a training, make sure that the paths to the dataset and experiment directories are correct. You can then start a training from a given config using the `--config` flag:
 
 ```
