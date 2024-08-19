@@ -1,8 +1,8 @@
 # data:
 dataset: adressa
-news_data_path: data/adressa/ten_weeks/datasets_test/all_news_norbert_ref.pkl
-train_user_data_path: data/adressa/ten_weeks/datasets_test/val_training.csv
-test_user_data_path: data/adressa/ten_weeks/datasets_test/val_eval.csv
+news_data_path: ../data/adressa/ten_weeks/datasets_test/all_news_norbert_ref.pkl
+train_user_data_path: ../data/adressa/ten_weeks/datasets_test/val_training.csv
+test_user_data_path: ../data/adressa/ten_weeks/datasets_test/val_eval.csv
 
 min_hist_len: 1
 # n_categories:

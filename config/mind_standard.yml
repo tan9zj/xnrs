@@ -1,9 +1,9 @@
 # data:
 dataset: mind
-train_news_data_path: /mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_train/news_full_smpnet_test.pkl
-train_user_data_path: /mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_train/behaviors.csv
-test_news_data_path: /mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_dev/news_full_smpnet_test.pkl
-test_user_data_path: /mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_dev/behaviors.csv
+train_news_data_path: ../data/mind/MINDlarge_train/news_full_smpnet_test.pkl
+train_user_data_path: ../data/mind/MINDlarge_train/behaviors.csv
+test_news_data_path: ../data/mind/MINDlarge_dev/news_full_smpnet_test.pkl
+test_user_data_path: ../data/mind/MINDlarge_dev/behaviors.csv
 
 min_hist_len: 1
 # n_categories:
