@@ -30,16 +30,19 @@ def train(cfg_path: PathLike, debug: bool = False):
         os.makedirs(dir)
 
     print('init logging')
-    wb.init(
-        config=cfg,
-        dir=dir,
-        project=cfg['project'],
-        tags=cfg['tags'],
-        notes=cfg['notes'],
-        name=cfg['name'],
-        mode=cfg['mode']
-    )
-    cfg = wb.config
+    if cfg['wandb']:
+        wb.init(
+            config=cfg,
+            dir=dir,
+            project=cfg['project'],
+            tags=cfg['tags'],
+            notes=cfg['notes'],
+            name=cfg['name'],
+            mode=cfg['mode']
+        )
+        cfg = wb.config
+    else:
+        cfg = DotMap(cfg)
 
     torch.manual_seed(cfg.random_seed)
     random.seed(cfg.random_seed)
