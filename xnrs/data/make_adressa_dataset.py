@@ -16,45 +16,45 @@ DAYS = ['20170101', '20170102', '20170103', '20170104', '20170105', '20170106', 
         '20170321', '20170322', '20170323', '20170324', '20170325', '20170326', '20170327', '20170328', '20170329', '20170330', '20170331']
 
 AdressaHandler.extract_days(
-    dir=join(ROOT_DIR, 'raw'), days=DAYS, dst_dir=join(ROOT_DIR, 'extracted_test')
+    dir=join(ROOT_DIR, 'raw'), days=DAYS, dst_dir=join(ROOT_DIR, 'extracted')
 )
 
 AdressaHandler.make_daily_datasets(
     DAYS, 
     N_days=10, 
-    src_dir=join(ROOT_DIR, 'extracted_test'),
-    dst_dir=join(ROOT_DIR, 'daily_datasets_test')
+    src_dir=join(ROOT_DIR, 'extracted'),
+    dst_dir=join(ROOT_DIR, 'daily_datasets')
     )
 
 AdressaHandler.combine_daily_datasets(
     days=['20170325', '20170326', '20170327', '20170328', '20170329'],
-    src_dir=join(ROOT_DIR, 'daily_datasets_test'),
-    dst_path=join(ROOT_DIR, 'datasets_test', 'dev_training.csv')
+    src_dir=join(ROOT_DIR, 'daily_datasets'),
+    dst_path=join(ROOT_DIR, 'datasets', 'dev_training.csv')
 )
 
 AdressaHandler.combine_daily_datasets(
     days=['20170330'],
-    src_dir=join(ROOT_DIR, 'daily_datasets_test'),
-    dst_path=join(ROOT_DIR, 'datasets_test', 'dev_eval.csv')
+    src_dir=join(ROOT_DIR, 'daily_datasets'),
+    dst_path=join(ROOT_DIR, 'datasets', 'dev_eval.csv')
 )
 
 AdressaHandler.combine_daily_datasets(
     days=['20170326', '20170327', '20170328', '20170329', '20170330'],
-    src_dir=join(ROOT_DIR, 'daily_datasets_test'),
-    dst_path=join(ROOT_DIR, 'datasets_test', 'val_training.csv')
+    src_dir=join(ROOT_DIR, 'daily_datasets'),
+    dst_path=join(ROOT_DIR, 'datasets', 'val_training.csv')
 )
 
 AdressaHandler.combine_daily_datasets(
     days=['20170331'],
-    src_dir=join(ROOT_DIR, 'daily_datasets_test'),
-    dst_path=join(ROOT_DIR, 'datasets_test', 'val_eval.csv')
+    src_dir=join(ROOT_DIR, 'daily_datasets'),
+    dst_path=join(ROOT_DIR, 'datasets', 'val_eval.csv')
 )
 
 # for the accuracy of our attributions, it is crucial to to set the arument relative_to_reference=True (cf. Section 4.3 of the paper)
 _ = AdressaHandler.embed_news(
     days=DAYS, 
     src_dir=join(ROOT_DIR, 'extracted'),
-    dst_path=join(ROOT_DIR, 'datasets_test', 'all_news_norbert_ref.pkl'),
+    dst_path=join(ROOT_DIR, 'datasets', 'all_news_norbert_ref.pkl'),
     model_name='ltg/norbert3-base',
     relative_to_reference=True 
     )

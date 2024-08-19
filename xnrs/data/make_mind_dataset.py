@@ -16,7 +16,7 @@ MODEL = 'sentence-transformers/all-mpnet-base-v2'
 # MODEL = 'roberta-base'
 # MODEL = 'uclanlp/newsbert'
 
-ABBR = 'smpnet_test'
+ABBR = 'smpnet'
 SEQ_LEN = 50
 REFERENCE = True
 
