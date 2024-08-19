@@ -9,7 +9,7 @@ This repository contains the code to the paper [*Explaining Neural News Recommen
  Content-based neural news recommender systems typically consist of a news and a user encoder. They implement a dual encoder architecture and match users' reading histories with candidate news recommendations as shown in the schema below (details in Section 3.1 of the paper). 
  We propose an explainability method for these recommenders that can attribute individual recommendations back onto the reading history of a given user. It can point out which news in a user's reading history were relevant for a given recommendation (red arrows below, detail in Section 3.2).
 
- ![schema](schema.png){: style="max-width: 250px;"}
+ ![schema](schema.png =50x)
 
  Our explanations can be visiualized as below:
 
