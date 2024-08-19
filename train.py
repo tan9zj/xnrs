@@ -49,7 +49,8 @@ def train(cfg_path: PathLike, debug: bool = False):
 
     print('init model')
     model = make_model(cfg)
-    wb.watch(model)
+    if cfg['wandb']:
+        wb.watch(model)
 
     print('init dataset (the first time this will take a while)')
     if cfg.dataset == 'mind':
