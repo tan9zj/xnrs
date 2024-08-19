@@ -1,0 +1,55 @@
+# data:
+dataset: mind
+train_news_data_path: /mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_train/news_full_smpnet_test.pkl
+train_user_data_path: /mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_train/behaviors.csv
+test_news_data_path: /mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_dev/news_full_smpnet_test.pkl
+test_user_data_path: /mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_dev/behaviors.csv
+
+min_hist_len: 1
+# n_categories:
+# n_subcategories:
+# n_users: 
+
+# model:
+model: 'standard'
+scoring: 'dot'
+text_features: ['title_emb']
+catg_features: []  # ['category_index']
+user_features: []  # ['user_index']
+add_features: []
+title_emb_dim: 256
+total_emb_dim: 256
+# cat_emb_dim: 16
+# user_emb_dim: 32
+d_backbone: 768
+# n_heads: 16
+# n_bilin: 8
+hist_len: 25
+seq_len: 50
+p_dropout: 0.
+bias: False
+# make sure that this is the model that was used to create news embeddings
+backbone: 'sentence-transformers/all-mpnet-base-v2'
+
+# training:
+num_workers: 2
+n_negatives: 4
+batch_size: 64
+shuffle_data: True
+n_epochs: 5
+test_freq: 1
+ckpt_freq: 1
+device: 'cuda:0'
+lr: 0.0001
+random_seed: 0
+apply_sigmoid: False
+load_article_ids: False
+  
+# logging:
+wandb: True
+mode: online
+project: 
+tags: [mind, standard]
+name: mind_standard
+dir: ../../experiments/
+notes: standard model on mind

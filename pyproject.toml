@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["xnrs"]
+
+[project]
+name = "xnrs"
+version = "1.0"
+requires-python = ">= 3.8" 
+dependencies = [
+    "datasets",
+    "torch",
+    "pandas",
+    "transformers",
+    "tqdm",
+    "dotmap",
+    "omegaconf",
+    "numpy",
+    "wandb",
+    "scikit-learn",
+    "matplotlib",
+    "pillow",
+    "wget"
+]
