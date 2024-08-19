@@ -49,9 +49,9 @@ $ pip install .
 
 The top level of the repository contains two demo notebooks. 
 
-The [demo_imaginary_data.ipynb](https://github.com/lucasmllr/xnrs/blob/main/demo_mind_data.ipynb) notebook works with imaginary news that you can type in or copy from somewhere. It loads our explainable model trained on the English MIND dataset and is probably the easiest entry point as it doesn't require any data pre-processing.
+The [demo_imaginary_data.ipynb](https://github.com/lucasmllr/xnrs/blob/main/demo_imaginary_data.ipynb) notebook works with imaginary news that you can type in or copy from somewhere. It loads our explainable model trained on the English MIND dataset and is probably the easiest entry point as it doesn't require any data pre-processing.
 
-The [demo_mind_data.ipynb](https://github.com/lucasmllr/xnrs/blob/main/demo_imaginary_data.ipynb) notebook loads the pre-processed MIND dataset and samples real reading sessions from its test set.
+The [demo_mind_data.ipynb](https://github.com/lucasmllr/xnrs/blob/main/demo_mind_data.ipynb) notebook loads the pre-processed MIND dataset and samples real reading sessions from its test set.
 To use this notebook you have to download the MIND dataset first and run the `xnrs.data.make_mind_dataset.py` script to pre-processes it including the pre-computation of transformer embeddings for the contained news. This will take a while.
 
 ### Model Weights
