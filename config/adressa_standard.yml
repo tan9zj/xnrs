@@ -47,7 +47,7 @@ load_article_ids: False
 # logging:
 wandb: False
 mode: offline
-project: nrs_xval
+project: xnrs
 tags: ['adressa', 'standard']
 name: adressa_standard
 dir: experiments/

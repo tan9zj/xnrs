@@ -46,9 +46,9 @@ apply_sigmoid: False
 load_article_ids: False
   
 # logging:
-wandb: True
-mode: online
-project: 
+wandb: False
+mode: offline
+project: xnrs
 tags: [mind, standard]
 name: mind_standard
 dir: ../../experiments/
