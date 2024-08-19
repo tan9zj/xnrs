@@ -9,11 +9,11 @@ This repository contains the code to the paper [*Explaining Neural News Recommen
  Content-based neural news recommender systems typically consist of a news and a user encoder. They implement a dual encoder architecture and match users' reading histories with candidate news recommendations as shown in the schema below (details in Section 3.1 of the paper). 
  We propose an explainability method for these recommenders that can attribute individual recommendations back onto the reading history of a given user. It can point out which news in a user's reading history were relevant for a given recommendation (red arrows below, detail in Section 3.2).
 
- ![schema](schema.png =50x)
+ <img src="schema.png" width="400"/>
 
  Our explanations can be visiualized as below:
 
-![example](example.png)
+ <img src="example.png" width="700"/>
 
 Here the candidate news at the top (in bold) is recommended with a score of 0.577 (max. is one) to the user with the reading history that is listed below. History news are ordered by how much they affect the given recommendation from top to bottom. Their individual attributions (left collumn) are theoretically guaranteed to sum to the overall recommendation score. 
 We can break down the news level attributions further onto a token level visualized by the red saliency map. In this example our method clearly shows that the given recommendation is based on related news about the royals. Unrelated news are ranked at the bottom of the list.
@@ -22,13 +22,13 @@ We can break down the news level attributions further onto a token level visuali
 
 We use our method to evaluate whether content-based news recommenders actually base their decision on related news in users' reading histories. To do this on a large scale we correlate our news level attributions to the predictions of semantic similarity models between a given candidate news and individual history news. The resulting distributions for three different such models are shown below.
 
-![sem_sim](sem_sim.png)
+ <img src="sem_sim.png" width="350"/>
 
 In some cases the correlation is quite high, showing that here the model does base its recommendations on semantic relatedness to previously read news. However, in a large fraction of the cases this is also not the case and the model entirely disregards semantic similarity.   
 
 Digging deeper, we find that the recommendation score is heavily driven by a bias that the model encodes into its user and news embeddings. The plot below shows distributions of all user- (oragne) und candidate news (blue) embeddings in the MIND test set:
 
-![distributions](polar_distributions.png){: style="max-width: 5000px;"}
+ <img src="polar_distributions.png" width="450"/>
 
 We receive this plot by integrating over the rotation around the mean user. It shows that users occupy a relatively narrow range in the embedding space. Candidate news on the other hand spread out to much larger angles from the mean user. As the recommendation score is calculated by a dot product between these embeddings, candidates from the far end of the news distribution always score low, because they are in a large angle to any user. Candidates from the close end of the news distribution, on the other hand, can score high (subject to rotation).
 
