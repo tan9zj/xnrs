@@ -122,6 +122,7 @@ class MindHandler:
         return user_data
 
     @staticmethod
+    # add columns names for news
     def read_news_as_df(path: PathLike, usecols=['id', 'category', 'subcategory', 'title', 'abstract'], **kwargs):
         news_data = pd.read_csv(
             path,
@@ -164,6 +165,7 @@ class MindHandler:
         return df[columns].to_dict('index')
 
     @staticmethod
+    # add columns names for behaviours
     def read_behaviours_tsv(
         src_path: PathLike,
         columns: List = ['user', 'time', 'history', 'impression']

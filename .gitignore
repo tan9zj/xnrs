@@ -9,3 +9,6 @@
 checkpoints/
 experiments/
 build/
+xnrs.egg-info/
+data/
+get_to_know_mind.ipynb

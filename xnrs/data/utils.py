@@ -121,7 +121,7 @@ def index_category(data: DataFrame, column: str, category_idx: Optional[dict] = 
     assert column in data.columns
     assert not data[column].isna().any()
     categories = sorted(list(data[column].unique()))
-    if category_idx is None:  # index all categories
+    if category_idx is None:  # index all categories, begin from 1
         category_idx = {
             c: i + 1 for i, c in enumerate(categories)
         }
