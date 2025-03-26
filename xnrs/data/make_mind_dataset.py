@@ -1,6 +1,7 @@
 from transformers import AutoModel, AutoTokenizer
 from torch import device
 import json
+import gzip
 
 from .mind import MindHandler
 from .utils import index_category
@@ -20,19 +21,19 @@ ABBR = 'smpnet'
 SEQ_LEN = 50
 REFERENCE = True
 
-DEVICE = 'cuda:1'
+DEVICE = 'cpu'
 
-SRC_TRAIN_NEWS_PATH = '/mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_train/news.tsv'
-DST_TRAIN_NEWS_PATH = f'/mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_train/news_full_{ABBR}.pkl'
-SRC_TRAIN_USER_PATH = '/mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_train/behaviors.tsv'
-DST_TRAIN_USER_PATH = '/mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_train/behaviors.csv'
+SRC_TRAIN_NEWS_PATH = '/var/scratch/zta207/data/MINDlarge_train/news.tsv'
+DST_TRAIN_NEWS_PATH = f'/var/scratch/zta207/data/MINDlarge_train/news_full_{ABBR}.pkl'
+SRC_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDlarge_train/behaviors.tsv'
+DST_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDlarge_train/behaviors.csv'
 
-SRC_TEST_NEWS_PATH = '/mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_dev/news.tsv'
-DST_TEST_NEWS_PATH = f'/mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_dev/news_full_{ABBR}.pkl'
-SRC_TEST_USER_PATH = '/mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_dev/behaviors.tsv'
-DST_TEST_USER_PATH = '/mount/arbeitsdaten33/projekte/tcl/data/mind/MINDlarge_dev/behaviors.csv'
+SRC_TEST_NEWS_PATH = '/var/scratch/zta207/data/MINDlarge_dev/news.tsv'
+DST_TEST_NEWS_PATH = f'/var/scratch/zta207/data/MINDlarge_dev/news_full_{ABBR}.pkl'
+SRC_TEST_USER_PATH = '/var/scratch/zta207/data/MINDlarge_dev/behaviors.tsv'
+DST_TEST_USER_PATH = '/var/scratch/zta207/data/MINDlarge_dev/behaviors.csv'
 
-CONFIG_PATH = f'/mount/arbeitsdaten33/projekte/tcl/data/mind/{ABBR}_config.json'
+CONFIG_PATH = f'/var/scratch/zta207/data/{ABBR}_config.json'
 
 
 # transforming beahiours 
