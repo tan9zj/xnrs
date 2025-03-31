@@ -163,6 +163,14 @@ class MindHandler:
         df = pd.read_pickle(path)
         return df[columns].to_dict('index')
 
+# # change how to read zip data
+#     @staticmethod
+#     def load_news_data_as_dict(path, columns=['title_emb', 'clicks']):
+#         import gzip, pickle
+#         with gzip.open(path, 'rb') as f:
+#             df = pickle.load(f)
+#         return df[columns].to_dict('index')
+
     @staticmethod
     def read_behaviours_tsv(
         src_path: PathLike,
