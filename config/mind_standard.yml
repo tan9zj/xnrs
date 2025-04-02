@@ -1,9 +1,9 @@
 # data:
 dataset: mind
-train_news_data_path: ../data/mind/MINDlarge_train/news_full_smpnet.pkl
-train_user_data_path: ../data/mind/MINDlarge_train/behaviors.csv
-test_news_data_path: ../data/mind/MINDlarge_dev/news_full_smpnet.pkl
-test_user_data_path: ../data/mind/MINDlarge_dev/behaviors.csv
+train_news_data_path: /var/scratch/zta207/data/MINDlarge_train/news_full_smpnet.pkl
+train_user_data_path: /var/scratch/zta207/data/MINDlarge_train/behaviors.csv
+test_news_data_path: /var/scratch/zta207/data/MINDlarge_dev/news_full_smpnet.pkl
+test_user_data_path: /var/scratch/zta207/data/MINDlarge_dev/behaviors.csv
 
 min_hist_len: 1
 # n_categories:
@@ -32,9 +32,11 @@ bias: False
 backbone: 'sentence-transformers/all-mpnet-base-v2'
 
 # training:
-num_workers: 2
+#num_workers: 2
+num_workers: 0
 n_negatives: 4
-batch_size: 64
+#batch_size: 64
+batch_size: 32
 shuffle_data: True
 n_epochs: 5
 test_freq: 1
@@ -51,5 +53,5 @@ mode: offline
 project: xnrs
 tags: [mind, standard]
 name: mind_standard
-dir: ../../experiments/
+dir: /var/scratch/zta207/experiments
 notes: standard model on mind

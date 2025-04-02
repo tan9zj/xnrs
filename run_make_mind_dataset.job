@@ -1,0 +1,19 @@
+#!/bin/bash
+#SBATCH --job-name=make_mind_dataset
+#SBATCH --output=make_mind_dataset_%j.out
+#SBATCH --error=make_mind_dataset_%j.err
+#SBATCH --time=01:00:00
+#SBATCH -N 1
+#SBATCH --ntasks-per-node=32
+#SBATCH --gres=gpu:1
+#SBATC --nodelist=node206
+source /var/scratch/zta207/miniconda3/etc/profile.d/conda.sh
+
+conda activate xfair
+
+module load cuda11.7/toolkit/11.7
+
+cd /home/zta207/xnrs
+
+python -m xnrs.data.make_mind_dataset
+
