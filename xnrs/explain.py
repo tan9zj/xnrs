@@ -80,6 +80,7 @@ class Explainer:
         else:
             return b, s
 
+    # use IG
     def explain_score_in_session(
         self,
         session_idx: int, 
@@ -158,7 +159,7 @@ class Explainer:
         da = 1 / n_steps
         grads = []
         for a in tqdm(torch.arange(da, 1 + da, da)):
-            ga = a * hist_emb
+            ga = a * hist_emb # step value
             ha, ham = self.model.news_encoder((ga, hist_att))
             ua = self.model.user_encoder.forward(inpt=(ha, ham))
             sa = self.activation(self.model.rec_model(ua, c))
@@ -278,4 +279,4 @@ if __name__ == '__main__':
         'hist_len': hist_len
     })
 
-    users.to_pickle('../../experiments/popularity_mind/users_w_hist_len.pkl')
+    users.to_pickle('../experiments/popularity_mind/users_w_hist_len.pkl')

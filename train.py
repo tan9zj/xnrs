@@ -14,6 +14,7 @@ from xnrs.data import make_mind_data
 from xnrs.data import AdressaHandler
 from xnrs.training import BCELogitsRankingTrainer, MSERankingTrainer
 
+import psutil
 
 def train(cfg_path: PathLike, debug: bool = False):
 
@@ -69,6 +70,7 @@ def train(cfg_path: PathLike, debug: bool = False):
     
 
 if __name__ == '__main__':
+    print("Memory usage before training:", psutil.virtual_memory().percent, "%")
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', '-c',
