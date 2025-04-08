@@ -2,7 +2,7 @@
 #SBATCH --job-name=make_mind_dataset
 #SBATCH --output=make_mind_dataset_%j.out
 #SBATCH --error=make_mind_dataset_%j.err
-#SBATCH --time=01:00:00
+#SBATCH --time=04:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=32
 #SBATCH --gres=gpu:1

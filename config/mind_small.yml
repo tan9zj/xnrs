@@ -1,9 +1,9 @@
 # data:
 dataset: mind
-train_news_data_path: /var/scratch/zta207/data/MINDlarge_train/news_full_smpnet.pkl
-train_user_data_path: /var/scratch/zta207/data/MINDlarge_train/behaviors.csv
-test_news_data_path: /var/scratch/zta207/data/MINDlarge_dev/news_full_smpnet.pkl
-test_user_data_path: /var/scratch/zta207/data/MINDlarge_dev/behaviors.csv
+train_news_data_path: /var/scratch/zta207/data/MINDsmall_train/news_full_smpnet.pkl
+train_user_data_path: /var/scratch/zta207/data/MINDsmall_train/behaviors.csv
+test_news_data_path: /var/scratch/zta207/data/MINDsmall_dev/news_full_smpnet.pkl
+test_user_data_path: /var/scratch/zta207/data/MINDsmall_dev/behaviors.csv
 
 min_hist_len: 1
 # n_categories:
@@ -51,6 +51,6 @@ wandb: False
 mode: offline
 project: xnrs
 tags: [mind, standard]
-name: mind_standard
+name: mind_small
 dir: /var/scratch/zta207/experiments
-notes: standard model on mind
+notes: standard model on mind small dataset

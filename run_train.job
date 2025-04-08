@@ -2,7 +2,7 @@
 #SBATCH --job-name=train_mind
 #SBATCH --output=train_mind_%j.out
 #SBATCH --error=train_mind_%j.err
-#SBATCH --time=04:00:00
+#SBATCH --time=10:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=32
 #SBATCH --gres=gpu:1
@@ -17,4 +17,4 @@ module load cuda11.7/toolkit/11.7
 
 cd /home/zta207/xnrs
 
-python train.py --config config/mind_standard.yml
+python train.py --config config/mind_small.yml

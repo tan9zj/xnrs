@@ -74,6 +74,7 @@ if __name__ == '__main__':
     parser.add_argument('--config', '-c',
         help='path to config file',
         default='config/mind_standard.yml'
+        # default='config/mind_small.yml'
     )
     args = parser.parse_args()
     train(cfg_path=args.config)

@@ -3,6 +3,7 @@ from torch import device
 import json
 import gzip
 import pickle
+import os
 
 from .mind import MindHandler
 from .utils import index_category
@@ -10,9 +11,9 @@ from .utils import index_category
 
 # configuration
 
-TRANSFORM_BEHAVIORS = False
+TRANSFORM_BEHAVIORS = True
 # PROCESS_NEWS = True
-PROCESS_TRAIN_NEWS = False
+PROCESS_TRAIN_NEWS = True
 PROCESS_TEST_NEWS = True
 
 MODEL = 'sentence-transformers/all-mpnet-base-v2'
@@ -26,31 +27,48 @@ REFERENCE = True
 
 DEVICE = 'cuda:0'
 
-SRC_TRAIN_NEWS_PATH = '/var/scratch/zta207/data/MINDlarge_train/news.tsv'
-DST_TRAIN_NEWS_PATH = f'/var/scratch/zta207/data/MINDlarge_train/news_full_{ABBR}.pkl'
-SRC_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDlarge_train/behaviors.tsv'
-DST_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDlarge_train/behaviors.csv'
+# SRC_TRAIN_NEWS_PATH = '/var/scratch/zta207/data/MINDlarge_train/news.tsv'
+# DST_TRAIN_NEWS_PATH = f'/var/scratch/zta207/data/MINDlarge_train/news_full_{ABBR}.pkl'
+# SRC_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDlarge_train/behaviors.tsv'
+# DST_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDlarge_train/behaviors.csv'
+SRC_TRAIN_NEWS_PATH = '/var/scratch/zta207/data/MINDsmall_train/news.tsv'
+DST_TRAIN_NEWS_PATH = f'/var/scratch/zta207/data/MINDsmall_train/news_full_{ABBR}.pkl'
+SRC_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDsmall_train/behaviors.tsv'
+DST_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDsmall_train/behaviors.csv'
 
-SRC_TEST_NEWS_PATH = '/var/scratch/zta207/data/MINDlarge_dev/news.tsv'
-DST_TEST_NEWS_PATH = f'/var/scratch/zta207/data/MINDlarge_dev/news_full_{ABBR}.pkl'
-SRC_TEST_USER_PATH = '/var/scratch/zta207/data/MINDlarge_dev/behaviors.tsv'
-DST_TEST_USER_PATH = '/var/scratch/zta207/data/MINDlarge_dev/behaviors.csv'
+# SRC_TEST_NEWS_PATH = '/var/scratch/zta207/data/MINDlarge_dev/news.tsv'
+# DST_TEST_NEWS_PATH = f'/var/scratch/zta207/data/MINDlarge_dev/news_full_{ABBR}.pkl'
+# SRC_TEST_USER_PATH = '/var/scratch/zta207/data/MINDlarge_dev/behaviors.tsv'
+# DST_TEST_USER_PATH = '/var/scratch/zta207/data/MINDlarge_dev/behaviors.csv'
+
+SRC_TEST_NEWS_PATH = '/var/scratch/zta207/data/MINDsmall_dev/news.tsv'
+DST_TEST_NEWS_PATH = f'/var/scratch/zta207/data/MINDsmall_dev/news_full_{ABBR}.pkl'
+SRC_TEST_USER_PATH = '/var/scratch/zta207/data/MINDsmall_dev/behaviors.tsv'
+DST_TEST_USER_PATH = '/var/scratch/zta207/data/MINDsmall_dev/behaviors.csv'
 
 CONFIG_PATH = f'/var/scratch/zta207/data/{ABBR}_config.json'
 
 CATEGORY_INDEX_PATH = f'/var/scratch/zta207/data/category_index.pkl'
 SUBCATEGORY_INDEX_PATH = f'/var/scratch/zta207/data/sub_category_index.pkl'
-
+USER_INDEX_PATH = f'/var/scratch/zta207/data/user_index.pkl'
 
 
 # transforming beahiours
 
 if TRANSFORM_BEHAVIORS:
-
     print('preparing user data')
 
     train_user_df = MindHandler.read_behaviours_tsv(src_path=SRC_TRAIN_USER_PATH)
-    train_user_df, user_idx = index_category(train_user_df, 'user', return_category_idx=True)
+
+    if not os.path.exists(USER_INDEX_PATH):
+        train_user_df, user_idx = index_category(train_user_df, 'user', return_category_idx=True)
+        with open(USER_INDEX_PATH, 'wb') as f:
+            pickle.dump(user_idx, f)
+    else:
+        with open(USER_INDEX_PATH, 'rb') as f:
+            user_idx = pickle.load(f)
+        train_user_df = index_category(train_user_df, column='user', category_idx=user_idx)
+
     train_user_df.to_csv(DST_TRAIN_USER_PATH)
 
     # indexing users
@@ -197,3 +215,4 @@ if PROCESS_TEST_NEWS:
     )
 
     test_news.to_pickle(DST_TEST_NEWS_PATH)
+    print("Completed!")
