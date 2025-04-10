@@ -1,3 +1,4 @@
+import pandas as pd
 from transformers import AutoModel, AutoTokenizer
 from torch import device
 import json
@@ -11,10 +12,11 @@ from .utils import index_category
 
 # configuration
 
-TRANSFORM_BEHAVIORS = True
+TRANSFORM_BEHAVIORS = False
+MAIN_CATEGORIES = True
 # PROCESS_NEWS = True
-PROCESS_TRAIN_NEWS = True
-PROCESS_TEST_NEWS = True
+PROCESS_TRAIN_NEWS = False
+PROCESS_TEST_NEWS = False
 
 MODEL = 'sentence-transformers/all-mpnet-base-v2'
 # MODEL = 'microsoft/mpnet-base'
@@ -35,6 +37,7 @@ SRC_TRAIN_NEWS_PATH = '/var/scratch/zta207/data/MINDsmall_train/news.tsv'
 DST_TRAIN_NEWS_PATH = f'/var/scratch/zta207/data/MINDsmall_train/news_full_{ABBR}.pkl'
 SRC_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDsmall_train/behaviors.tsv'
 DST_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDsmall_train/behaviors.csv'
+DST_TRAIN_USER_PATH2 = '/var/scratch/zta207/data/MINDsmall_train/behaviors2.csv'
 
 # SRC_TEST_NEWS_PATH = '/var/scratch/zta207/data/MINDlarge_dev/news.tsv'
 # DST_TEST_NEWS_PATH = f'/var/scratch/zta207/data/MINDlarge_dev/news_full_{ABBR}.pkl'
@@ -45,6 +48,7 @@ SRC_TEST_NEWS_PATH = '/var/scratch/zta207/data/MINDsmall_dev/news.tsv'
 DST_TEST_NEWS_PATH = f'/var/scratch/zta207/data/MINDsmall_dev/news_full_{ABBR}.pkl'
 SRC_TEST_USER_PATH = '/var/scratch/zta207/data/MINDsmall_dev/behaviors.tsv'
 DST_TEST_USER_PATH = '/var/scratch/zta207/data/MINDsmall_dev/behaviors.csv'
+DST_TEST_USER_PATH2 = '/var/scratch/zta207/data/MINDsmall_dev/behaviors2.csv'
 
 CONFIG_PATH = f'/var/scratch/zta207/data/{ABBR}_config.json'
 
@@ -76,11 +80,62 @@ if TRANSFORM_BEHAVIORS:
     test_user_df = index_category(test_user_df, column='user', category_idx=user_idx)
     test_user_df.to_csv(DST_TEST_USER_PATH)
 
+if MAIN_CATEGORIES:
+    print('computing main categories for train users...')
+    train_news = MindHandler.read_news_as_df(SRC_TRAIN_NEWS_PATH)
+    train_news.reset_index(inplace=True)
+    news_cat_map = dict(zip(train_news['id'], train_news['category']))
+
+    user_main_category = {}
+
+    # train_user_df = MindHandler.read_behaviours_tsv(src_path=SRC_TRAIN_USER_PATH)
+    train_user_df = pd.read_csv('/var/scratch/zta207/data/MINDsmall_train/behaviors.csv')
+    for idx, row in train_user_df.iterrows():
+        user_id = row['user']
+        history_str = row['history']
+        if pd.isna(history_str):
+            continue
+        history_list = history_str.split(' ')
+        cats = [news_cat_map.get(news_id) for news_id in history_list if news_id in news_cat_map]
+        if not cats:
+            continue
+
+        main_cat = max(set(cats), key=cats.count)
+        user_main_category[user_id] = main_cat
+    train_user_df['main_category'] = train_user_df['user'].map(user_main_category)
+    print('saving train user behavior')
+    train_user_df.to_csv(DST_TRAIN_USER_PATH2, index=False)
+
+
+    print('computing main categories for test users...')
+    test_news = MindHandler.read_news_as_df(SRC_TEST_NEWS_PATH)
+    test_news.reset_index(inplace=True)
+    news_cat_map_test = dict(zip(test_news['id'], test_news['category']))
+
+    user_main_category_test = {}
+    test_user_df = pd.read_csv('/var/scratch/zta207/data/MINDsmall_dev/behaviors.csv')
+
+    for idx, row in test_user_df.iterrows():
+        user_id = row['user']
+        history_str = row['history']
+        if pd.isna(history_str):
+            continue
+        history_list = history_str.split(' ')
+        cats = [news_cat_map_test.get(news_id) for news_id in history_list if news_id in news_cat_map_test]
+        if not cats:
+            continue
+        main_cat = max(set(cats), key=cats.count)
+        user_main_category_test[user_id] = main_cat
+
+    test_user_df['main_category'] = test_user_df['user'].map(user_main_category_test)
+    print('saving test user behavior')
+    test_user_df.to_csv(DST_TEST_USER_PATH2, index=False)
+
+# pre-processing news
+
 print('init transformer')
 tokenizer = AutoTokenizer.from_pretrained(MODEL)
 transformer = AutoModel.from_pretrained(MODEL)
-
-# pre-processing news
 
 if PROCESS_TRAIN_NEWS:
 
