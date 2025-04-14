@@ -1,0 +1,47 @@
+loading config
+init logging
+init model
+init dataset (the first time this will take a while)
+init trainer
+starting training
+lamdba = 0.1
+
+ Epoch 0:
+training:
+saving checkpoint
+[Epoch 0] total: 0.2438, rec: 0.1580, cl: 0.8578
+testing:
+[Eval 0] loss: 0.0996, ndcg@5: 0.3145, auc: 0.6251
+Too few embeddings for visualization.
+
+ Epoch 1:
+training:
+saving checkpoint
+[Epoch 1] total: 0.2154, rec: 0.1484, cl: 0.6695
+testing:
+[Eval 1] loss: 0.0987, ndcg@5: 0.3258, auc: 0.6382
+Too few embeddings for visualization.
+
+ Epoch 2:
+training:
+saving checkpoint
+[Epoch 2] total: 0.2028, rec: 0.1464, cl: 0.5649
+testing:
+[Eval 2] loss: 0.1005, ndcg@5: 0.3317, auc: 0.6452
+Too few embeddings for visualization.
+
+ Epoch 3:
+training:
+saving checkpoint
+[Epoch 3] total: 0.1942, rec: 0.1451, cl: 0.4913
+testing:
+[Eval 3] loss: 0.1004, ndcg@5: 0.3360, auc: 0.6477
+Too few embeddings for visualization.
+
+ Epoch 4:
+training:
+saving checkpoint
+[Epoch 4] total: 0.1869, rec: 0.1441, cl: 0.4277
+testing:
+[Eval 4] loss: 0.0974, ndcg@5: 0.3412, auc: 0.6509
+Too few embeddings for visualization.
