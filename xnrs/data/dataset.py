@@ -32,9 +32,9 @@ class NewsRecDataset(Dataset):
         self.l_seq = l_seq
         self.l_hist = l_hist
 
-        self.text_features = text_features
-        self.catg_features = catg_features
-        self.user_features = user_features
+        self.text_features = text_features # embeddings
+        self.catg_features = catg_features # cat_index
+        self.user_features = user_features # user_id
         self.add_features = add_features
         self.load_article_ids = load_article_ids
         self.loss_weights = loss_weights
@@ -148,6 +148,9 @@ class NewsRecDataset(Dataset):
             targets = torch.FloatTensor([1] * len(positives) + [0] * len(negatives)).unsqueeze(1)
 
         return_dict['targets'] = targets
+
+        # add main_category into batch for CL
+        return_dict['main_category'] = session['main_category']
 
         if return_news:  # for additional features
             return return_dict, hist_features, pos_features, neg_features

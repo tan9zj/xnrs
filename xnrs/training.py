@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from requests.packages import target
 from torch.utils.data import DataLoader, Dataset
 import numpy as np
 from tqdm import tqdm
@@ -14,8 +15,9 @@ from typing import Optional
 
 from .evaluation import metrics as eval
 from . import utils
-from .utils import batch_to_device  
-
+from .utils import batch_to_device
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
 
 class BaseTrainer(ABC):
 
@@ -342,3 +344,146 @@ class MSERankingTrainer(RankingTrainer):
         oupt = self.model.forward(batch)
         return torch.relu(oupt)
         # return self.model.forward(batch)
+
+class ContrastiveRankingTrainer(MSERankingTrainer):
+
+    def _init_loss(self):
+        super()._init_loss()
+        self.temperature = self.cfg.get('contrastive_temperature', 0.1)
+        self.lambda_cl = self.cfg.get('contrastive_lambda', 0.1)
+
+    def _train_step(self, batch: dict) -> dict:
+        self.optimizer.zero_grad()
+
+        targets = batch['targets'].to(self.device)
+        preds = self.forward(batch)
+        loss_rec = self.L(preds, targets)
+
+        user_embeddings = self.model.get_user_embeddings(batch) # shape: [B, D]
+
+        main_cats = batch['main_category']
+        unique_cats = list(set(main_cats))
+        cat_to_idx = {cat: idx for idx, cat in enumerate(unique_cats)}
+        cat_labels = torch.tensor([cat_to_idx[c] for c in main_cats]).to(self.device)  # shape: [B]
+
+        # CL loss
+        loss_cl = self._compute_contrastive_loss(user_embeddings, cat_labels)
+
+        loss_total = loss_rec + self.lambda_cl * loss_cl
+        loss_total.backward()
+        self.optimizer.step()
+
+        return {
+            "loss": loss_total.item(),
+            "loss_rec": loss_rec.item(),
+            "loss_cl": loss_cl.item(),
+            "logits": preds
+        }
+
+    def _compute_contrastive_loss(self, embeddings: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+        """
+            embeddings: B,D
+            labels: B
+        """
+        embeddings = nn.functional.normalize(embeddings, dim=-1)
+        sim_matrix = torch.matmul(embeddings, embeddings.T)
+
+        B = embeddings.size(0)
+        loss = 0.0
+        count = 0
+        device = labels.device
+
+        for i in range(B):
+            # if same cat label -> positive
+            # different cat label -> negative
+            pos_mask = (labels == labels[i]) & (torch.arange(B, device=device) != i)
+            neg_mask = (labels != labels[i])
+
+            pos_sims = sim_matrix[i][pos_mask] / self.temperature
+            all_sims = sim_matrix[i][torch.arange(B, device=device) != i] / self.temperature
+            if len(pos_sims) == 0:
+                continue
+            numerator = torch.exp(pos_sims).sum()
+            denominator = torch.exp(all_sims).sum()
+
+            loss += -torch.log(numerator / (denominator + 1e-12))
+            count += 1
+        return loss / (count + 1e-8)
+
+    def _after_train_step(self, results: dict):
+        if self.cfg.wandb:
+            wandb.log({
+                "loss_total": results["loss"],
+                "loss_rec": results["loss_rec"],
+                "loss_cl": results["loss_cl"],
+                "step": self.current_train_step
+            })
+        self.current_train_step += 1
+
+    def _after_train_iteration(self, results: list):
+        if self.cfg.ckpt_freq is not None:
+            if self.current_epoch % self.cfg.ckpt_freq == 0 or self.current_epoch == self.cfg.n_epochs - 1:
+                self._save_checkpoint()
+
+        epoch_loss_total = np.mean([d['loss'] for d in results])
+        epoch_loss_rec = np.mean([d['loss_rec'] for d in results])
+        epoch_loss_cl = np.mean([d['loss_cl'] for d in results])
+
+        if self.cfg.wandb:
+            wandb.log({
+                'epoch_loss_total': epoch_loss_total,
+                'epoch_loss_rec': epoch_loss_rec,
+                'epoch_loss_cl': epoch_loss_cl,
+                'epoch': self.current_epoch
+            })
+
+        print(f"[Epoch {self.current_epoch}] total: {epoch_loss_total:.4f}, "
+              f"rec: {epoch_loss_rec:.4f}, cl: {epoch_loss_cl:.4f}")
+
+    # def _visualize_user_embeddings(self, results):
+    #     all_embeds = []
+    #     all_labels = []
+    #
+    #     for r in results:
+    #         if 'user_embeddings' in r and 'main_category' in r:
+    #             all_embeds.append(r['user_embeddings'])  # shape: [D]
+    #             all_labels.append(r['main_category'])
+    #
+    #     if len(all_embeds) < 10:
+    #         print("Too few embeddings for visualization.")
+    #         return
+    #
+    #     embeds = np.stack(all_embeds)
+    #     tsne = TSNE(n_components=2, perplexity=30, init='random', random_state=42)
+    #     reduced = tsne.fit_transform(embeds)
+    #
+    #     fig, ax = plt.subplots(figsize=(6, 5))
+    #     for cat in set(all_labels):
+    #         idxs = [i for i, c in enumerate(all_labels) if c == cat]
+    #         ax.scatter(reduced[idxs, 0], reduced[idxs, 1], label=cat, alpha=0.6)
+    #     ax.legend()
+    #     ax.set_title("User Embedding t-SNE")
+    #
+    #     if self.cfg.wandb:
+    #         wandb.log({"user_embedding_tsne": wandb.Image(fig)})
+    #     plt.close(fig)
+
+    def _after_test_iteration(self, results: list):
+        loss = np.mean([d['loss'] for d in results])
+        ndcg5 = np.mean([d['ndcg@5'] for d in results])
+        ndcg10 = np.mean([d['ndcg@10'] for d in results])
+        auc = np.mean([d['auc'] for d in results])
+
+        if self.cfg.wandb:
+            wandb.log({
+                'val_loss': loss,
+                'val_ndcg@5': ndcg5,
+                'val_ndcg@10': ndcg10,
+                'val_auc': auc,
+                'epoch': self.current_epoch
+            })
+
+        print(f"[Eval {self.current_epoch}] loss: {loss:.4f}, ndcg@5: {ndcg5:.4f}, auc: {auc:.4f}")
+
+        if self.cfg.get("visualize_user_embeddings", False):
+            self._visualize_user_embeddings(results)

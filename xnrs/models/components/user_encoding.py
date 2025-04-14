@@ -33,7 +33,7 @@ class UserEncoder(nn.Module):
         
     def forward(
         self, 
-        inpt: tuple, 
+        inpt: tuple, # (x,m)
         add_features: Optional[dict] = None,
         return_weights: bool = False    
     ):

@@ -47,14 +47,17 @@ random_seed: 0
 apply_sigmoid: False
 load_article_ids: False
 contrastive_temperature: 0.1
-contrastive_lambda: 0.1
+#contrastive_lambda: 0.1
+#contrastive_lambda: 0.01
+contrastive_lambda: 0.005
 
-  
+visualize_user_embeddings: true
+
 # logging:
 wandb: False
 mode: offline
 project: xnrs
 tags: [mind, standard]
-name: mind_small
+name: mind_small_CL
 dir: /var/scratch/zta207/experiments
-notes: standard model on mind small dataset
+notes: test CL

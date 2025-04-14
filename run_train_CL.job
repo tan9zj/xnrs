@@ -1,0 +1,20 @@
+#!/bin/bash
+#SBATCH --job-name=train_mind
+#SBATCH --output=test_CL_%j.out
+#SBATCH --error=test_CL_%j.err
+#SBATCH --time=10:00:00
+#SBATCH -N 1
+#SBATCH --ntasks-per-node=32
+#SBATCH --gres=gpu:1
+#SBATCH --nodelist=node219
+
+
+source /var/scratch/zta207/miniconda3/etc/profile.d/conda.sh
+conda activate xfair
+
+module load cuda11.7/toolkit/11.7
+
+
+cd /home/zta207/xnrs
+
+python train.py --config config/mind_small_CL.yml

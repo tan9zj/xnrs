@@ -12,8 +12,7 @@ from dotmap import DotMap
 from xnrs.models import make_model
 from xnrs.data import make_mind_data
 from xnrs.data import AdressaHandler
-from xnrs.training import BCELogitsRankingTrainer, MSERankingTrainer
-
+from xnrs.training import BCELogitsRankingTrainer, MSERankingTrainer, ContrastiveRankingTrainer
 
 def train(cfg_path: PathLike, debug: bool = False):
 
@@ -62,7 +61,8 @@ def train(cfg_path: PathLike, debug: bool = False):
 
     print('init trainer')
     # trainer = BCELogitsRankingTrainer(cfg, model, train_ds, test_ds)
-    trainer = MSERankingTrainer(cfg, model, train_ds, test_ds)
+    # trainer = MSERankingTrainer(cfg, model, train_ds, test_ds)
+    trainer = ContrastiveRankingTrainer(cfg, model, train_ds, test_ds)
 
     print('starting training')
     trainer.train()
@@ -73,8 +73,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', '-c',
         help='path to config file',
-        default='config/mind_standard.yml'
-        # default='config/mind_small.yml'
+        # default='config/mind_standard.yml'
+        default='config/mind_small.yml'
     )
     args = parser.parse_args()
     train(cfg_path=args.config)
