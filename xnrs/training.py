@@ -15,7 +15,7 @@ from typing import Optional
 
 from .evaluation import metrics as eval
 from . import utils
-from .utils import batch_to_device
+from .utils import batch_to_device, to_polar, plot_polar
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 
@@ -439,51 +439,72 @@ class ContrastiveRankingTrainer(MSERankingTrainer):
 
         print(f"[Epoch {self.current_epoch}] total: {epoch_loss_total:.4f}, "
               f"rec: {epoch_loss_rec:.4f}, cl: {epoch_loss_cl:.4f}")
+        
+        if self.cfg.get("plot_polar", False):
+            self._plot_polar_distribution()
+            
+    def _plot_polar_distribution(self):
+        self.model.eval()
+        all_user_raw, all_news = [], []
+        with torch.no_grad():
+            for batch in self.trainloader:
+                batch_to_device(batch, self.device)
+                
+                user_emb = self.model.get_user_embeddings(batch) # shape: [B, D] or [B, 1, D]
+                if len(user_emb.shape) == 3:
+                    user_emb = user_emb.squeeze(1)
+                all_user_raw.append(user_emb.cpu().numpy())
+                
+                # Get news embeddings
+                news_emb = self.model.get_news_embeddings(batch)
+                if len(news_emb.shape) == 3:
+                    B, N, D = news_emb.shape
+                    news_emb = news_emb.view(B * N, D)
+                elif len(news_emb.shape) == 2:
+                    pass
+                else:
+                    raise ValueError(f"Unexpected news_emb shape: {news_emb.shape}")
+                all_news.append(news_emb.cpu().numpy())
+                if self.cfg.debug:
+                    break
 
-    # def _visualize_user_embeddings(self, results):
-    #     all_embeds = []
-    #     all_labels = []
-    #
-    #     for r in results:
-    #         if 'user_embeddings' in r and 'main_category' in r:
-    #             all_embeds.append(r['user_embeddings'])  # shape: [D]
-    #             all_labels.append(r['main_category'])
-    #
-    #     if len(all_embeds) < 10:
-    #         print("Too few embeddings for visualization.")
-    #         return
-    #
-    #     embeds = np.stack(all_embeds)
-    #     tsne = TSNE(n_components=2, perplexity=30, init='random', random_state=42)
-    #     reduced = tsne.fit_transform(embeds)
-    #
-    #     fig, ax = plt.subplots(figsize=(6, 5))
-    #     for cat in set(all_labels):
-    #         idxs = [i for i, c in enumerate(all_labels) if c == cat]
-    #         ax.scatter(reduced[idxs, 0], reduced[idxs, 1], label=cat, alpha=0.6)
-    #     ax.legend()
-    #     ax.set_title("User Embedding t-SNE")
-    #
-    #     if self.cfg.wandb:
-    #         wandb.log({"user_embedding_tsne": wandb.Image(fig)})
-    #     plt.close(fig)
+        user_array = np.concatenate(all_user_raw, axis=0)
+        news_array = np.concatenate(all_news, axis=0)
+        
+        mean_user = user_array.mean(axis=0)
+        user_polar = to_polar(user_array, mean_user)
+        news_polar = to_polar(news_array, mean_user)
 
-    def _after_test_iteration(self, results: list):
-        loss = np.mean([d['loss'] for d in results])
-        ndcg5 = np.mean([d['ndcg@5'] for d in results])
-        ndcg10 = np.mean([d['ndcg@10'] for d in results])
-        auc = np.mean([d['auc'] for d in results])
-
+        out_path = os.path.join(self.cfg.dir, self.cfg.name, f"polar_epoch_{self.current_epoch}.png")
+        plot_polar(user_polar, news_polar, labels=("User", "News"), out_path=out_path)
+        print(f"[PLOT] Saved polar plot to {out_path}")
+  
+        
+    def _visualize_user_embeddings(self, results):
+        all_embeds = []
+        all_labels = []
+    
+        for r in results:
+            if 'user_embeddings' in r and 'main_category' in r:
+                all_embeds.append(r['user_embeddings'])  # shape: [D]
+                all_labels.append(r['main_category'])
+    
+        if len(all_embeds) < 10:
+            print("Too few embeddings for visualization.")
+            return
+    
+        embeds = np.stack(all_embeds)
+        tsne = TSNE(n_components=2, perplexity=30, init='random', random_state=42)
+        reduced = tsne.fit_transform(embeds)
+    
+        fig, ax = plt.subplots(figsize=(6, 5))
+        for cat in set(all_labels):
+            idxs = [i for i, c in enumerate(all_labels) if c == cat]
+            ax.scatter(reduced[idxs, 0], reduced[idxs, 1], label=cat, alpha=0.6)
+        ax.legend()
+        ax.set_title("User Embedding t-SNE")
+    
         if self.cfg.wandb:
-            wandb.log({
-                'val_loss': loss,
-                'val_ndcg@5': ndcg5,
-                'val_ndcg@10': ndcg10,
-                'val_auc': auc,
-                'epoch': self.current_epoch
-            })
-
-        print(f"[Eval {self.current_epoch}] loss: {loss:.4f}, ndcg@5: {ndcg5:.4f}, auc: {auc:.4f}")
-
-        if self.cfg.get("visualize_user_embeddings", False):
-            self._visualize_user_embeddings(results)
+            wandb.log({"user_embedding_tsne": wandb.Image(fig)})
+        plt.close(fig)
+        

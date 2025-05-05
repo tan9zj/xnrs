@@ -129,4 +129,39 @@ def ranking_loss(p: torch.Tensor, n: torch.Tensor, reduction: str = 'mean'):
         return loss
     else:
         raise ValueError(f'got {reduction} for arg "reduction", but only support "mean" or "none".')
+    
+# polar plot
+import numpy as np
 
+def to_polar(vectors, reference):
+    norms = np.linalg.norm(vectors, axis=1)
+    unit_vectors = vectors / (norms[:, None] + 1e-8)
+    ref = reference / (np.linalg.norm(reference) + 1e-8)
+    angles = np.arccos(np.clip(unit_vectors @ ref, -1.0, 1.0))
+    return np.stack([angles, norms], axis=1)
+
+
+import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde
+
+def plot_polar(data1, data2, labels=('User', 'News'), out_path='polar_plot.png'):
+    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(6, 4))
+    for data, label in zip([data1, data2], labels):
+        angles, lengths = data[:, 0], data[:, 1]
+        x = lengths * np.cos(angles)
+        y = lengths * np.sin(angles)
+        kde = gaussian_kde(np.vstack([x, y]))
+        r = np.linspace(0, 0.5, 100)
+        theta = np.linspace(0, np.pi, 100)
+        R, T = np.meshgrid(r, theta)
+        X = R * np.cos(T)
+        Y = R * np.sin(T)
+        Z = kde(np.vstack([X.ravel(), Y.ravel()])).reshape(R.shape)
+        ax.contour(T, R, Z)
+        max_idx = np.unravel_index(Z.argmax(), Z.shape)
+        ax.text(T[max_idx], R[max_idx], label)
+    ax.set_theta_zero_location("E")
+    ax.set_theta_direction(-1)
+    ax.set_title("Embedding Polar Distribution")
+    fig.savefig(out_path)
+    plt.close(fig)

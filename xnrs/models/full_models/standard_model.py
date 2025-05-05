@@ -35,7 +35,7 @@ class StandardRec(ParentRec):
             user_encoder=user_encoder,
             rec_model=rec_model
         )
-
+    
     def get_user_embeddings(self, batch: dict) -> torch.Tensor:
         """
         give user history and get user embedding
@@ -45,8 +45,9 @@ class StandardRec(ParentRec):
         H: history size
         L: sequence length
         D: embedding dimension
-
         """
+        # TODO: add impression
+        # TODO: do the combination of impression and history
         history = batch['user_features']['history'][self.text_feature]
 
         if isinstance(history, list) and len(history) == 2:
@@ -68,3 +69,32 @@ class StandardRec(ParentRec):
         # print(f"[DEBUG] User embedding shape: {user_emb.shape}")
 
         return user_emb.squeeze(1)
+    
+    def get_news_embeddings(self, batch: dict, mode: str = 'candidate') -> torch.Tensor:
+        """
+        Get news embeddings from the news encoder.
+
+        Args:
+            batch (dict): input batch with keys 'candidate_features' or 'user_features'
+            mode (str): 'candidate' for current news; 'history' for user clicked news
+
+        Returns:
+            torch.Tensor: News embeddings [B, D] or [B, N, D]
+        """
+        if mode == 'candidate':
+            news_input = batch['candidate_features'][self.text_feature]
+        elif mode == 'history':
+            news_input = batch['user_features']['history'][self.text_feature]
+        else:
+            raise ValueError("mode must be 'candidate' or 'history'")
+
+        if isinstance(news_input, list) and len(news_input) == 2:
+            news_input = tuple(news_input)
+
+        x, m = news_input
+        device = next(self.parameters()).device
+        x = x.to(device)
+        m = m.to(device)
+
+        news_emb, _ = self.news_encoder((x, m))
+        return news_emb

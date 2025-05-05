@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=train_mind
-#SBATCH --output=test_CL_%j.out
-#SBATCH --error=test_CL_%j.err
+#SBATCH --output=test_CL_plot_%j.out
+#SBATCH --error=test_CL_plot_%j.err
 #SBATCH --time=10:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=32
 #SBATCH --gres=gpu:1
-#SBATCH --nodelist=node219
+#SBATCH --constraint=gpunode
 
 
 source /var/scratch/zta207/miniconda3/etc/profile.d/conda.sh
