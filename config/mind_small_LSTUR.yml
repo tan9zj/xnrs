@@ -7,21 +7,25 @@ test_news_data_path: /var/scratch/zta207/data/MINDsmall_dev/news_full_smpnet.pkl
 #test_user_data_path: /var/scratch/zta207/data/MINDsmall_dev/behaviors.csv
 test_user_data_path: /var/scratch/zta207/data/MINDsmall_dev/behaviors2.csv
 min_hist_len: 1
-# n_categories:
-# n_subcategories:
-# n_users: 
+n_categories: 17
+n_subcategories: 264
+n_users: 50000
 
 # model:
 model: 'LSTUR'
+base_model: 'LSTUR'
+long_short_term_method: 'con'
+long_term_method: 'embedding'
+p_user_dropout: 0.07
 scoring: 'dot'
 text_features: ['title_emb']
-catg_features: []  # ['category_index']
-user_features: []  # ['user_index']
+catg_features: ['category_index']  # ['category_index']
+user_features: ['user_index']  # ['user_index']
 add_features: []
 title_emb_dim: 256
 total_emb_dim: 256
-# cat_emb_dim: 16
-# user_emb_dim: 32
+cat_emb_dim: 16
+user_emb_dim: 32
 d_backbone: 768
 # n_heads: 16
 # n_bilin: 8

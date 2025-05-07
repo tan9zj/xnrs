@@ -1,0 +1,20 @@
+loading config
+init logging
+init model
+init dataset (the first time this will take a while)
+init trainer
+starting training
+✅ Saved user embeddings to /var/scratch/zta207/experiments/mind_small_CL_3/before_cl_user_emb.csv
+
+ Epoch 0:
+training:
+saving checkpoint
+test iteration in CL trainer
+[Epoch 0] total: 0.1580, rec: 0.1470, cl: 1.1044
+testing:
+test iteration in ranking trainer
+saving scores
+test loss: 0.0984, ndcg@5: 0.3441, mrr: 0.3604, ctr@1: 0.1887, auc: 0.6595, acc: 0.8981, rec: 0.0184, prec: 0.0192
+
+ Epoch 1:
+training:

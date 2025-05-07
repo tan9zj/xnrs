@@ -36,6 +36,7 @@ class TextEncoder(nn.Module):
         Args:
             inpt (tuple): (
                 x: sequential (ie not reduced) news embeddings, shape (B, N, S, D)
+                B=batch_size, N=number of news, S=number of tokens, D=dimension
                 m: attention masks, shape (B, N, S, 1)
                 )
         '''

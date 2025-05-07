@@ -2,10 +2,10 @@
 dataset: mind
 train_news_data_path: /var/scratch/zta207/data/MINDsmall_train/news_full_smpnet.pkl
 #train_user_data_path: /var/scratch/zta207/data/MINDsmall_train/behaviors.csv
-train_user_data_path: /var/scratch/zta207/data/MINDsmall_train/behaviors2.csv
+train_user_data_path: /var/scratch/zta207/data/MINDsmall_train/behaviors3.csv
 test_news_data_path: /var/scratch/zta207/data/MINDsmall_dev/news_full_smpnet.pkl
 #test_user_data_path: /var/scratch/zta207/data/MINDsmall_dev/behaviors.csv
-test_user_data_path: /var/scratch/zta207/data/MINDsmall_dev/behaviors2.csv
+test_user_data_path: /var/scratch/zta207/data/MINDsmall_dev/behaviors3.csv
 min_hist_len: 1
 # n_categories:
 # n_subcategories:
@@ -39,6 +39,7 @@ n_negatives: 4
 batch_size: 64
 shuffle_data: True
 n_epochs: 5
+# n_epochs: 1 
 test_freq: 1
 ckpt_freq: 1
 device: 'cuda:0'
@@ -46,18 +47,20 @@ lr: 0.0001
 random_seed: 0
 apply_sigmoid: False
 load_article_ids: False
-contrastive_temperature: 0.1
+# contrastive_temperature: 0.1
+contrastive_temperature: 0.08
 #contrastive_lambda: 0.1
-#contrastive_lambda: 0.01
-contrastive_lambda: 0.005
+contrastive_lambda: 0.01
+# contrastive_lambda: 0.005
 
-visualize_user_embeddings: true
+visualize_user_embeddings: False
+plot_polar: True
 
 # logging:
 wandb: False
 mode: offline
 project: xnrs
 tags: [mind, standard]
-name: mind_small_CL
+name: mind_small_CL_3
 dir: /var/scratch/zta207/experiments
 notes: test CL

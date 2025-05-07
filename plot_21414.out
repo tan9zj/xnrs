@@ -1,0 +1,5 @@
+Loaded 51282 news items from /var/scratch/zta207/data/MINDsmall_train/news_full_smpnet.pkl
+Initialized TextEncoder with in_dim=768, out_dim=256
+✅ Saved final news embeddings to /var/scratch/zta207/experiments/mind_small_CL_2/news_final_emb.csv
+🎨 Generating polar plot...
+🎨 Polar plot saved to /var/scratch/zta207/experiments/mind_small_CL_2/news_polar.png

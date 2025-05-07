@@ -37,7 +37,8 @@ SRC_TRAIN_NEWS_PATH = '/var/scratch/zta207/data/MINDsmall_train/news.tsv'
 DST_TRAIN_NEWS_PATH = f'/var/scratch/zta207/data/MINDsmall_train/news_full_{ABBR}.pkl'
 SRC_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDsmall_train/behaviors.tsv'
 DST_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDsmall_train/behaviors.csv'
-DST_TRAIN_USER_PATH2 = '/var/scratch/zta207/data/MINDsmall_train/behaviors2.csv'
+DST_TRAIN_USER_PATH2 = '/var/scratch/zta207/data/MINDsmall_train/behaviors2.csv' # for main category
+DST_TRAIN_USER_PATH3 = '/var/scratch/zta207/data/MINDsmall_train/behaviors3.csv'
 
 # SRC_TEST_NEWS_PATH = '/var/scratch/zta207/data/MINDlarge_dev/news.tsv'
 # DST_TEST_NEWS_PATH = f'/var/scratch/zta207/data/MINDlarge_dev/news_full_{ABBR}.pkl'
@@ -49,6 +50,7 @@ DST_TEST_NEWS_PATH = f'/var/scratch/zta207/data/MINDsmall_dev/news_full_{ABBR}.p
 SRC_TEST_USER_PATH = '/var/scratch/zta207/data/MINDsmall_dev/behaviors.tsv'
 DST_TEST_USER_PATH = '/var/scratch/zta207/data/MINDsmall_dev/behaviors.csv'
 DST_TEST_USER_PATH2 = '/var/scratch/zta207/data/MINDsmall_dev/behaviors2.csv'
+DST_TEST_USER_PATH3 = '/var/scratch/zta207/data/MINDsmall_dev/behaviors3.csv'
 
 CONFIG_PATH = f'/var/scratch/zta207/data/{ABBR}_config.json'
 
@@ -81,7 +83,7 @@ if TRANSFORM_BEHAVIORS:
     test_user_df.to_csv(DST_TEST_USER_PATH)
 
 if MAIN_CATEGORIES:
-    print('computing main categories for train users...')
+    print('computing main categories and clicks for train users...')
     train_news = MindHandler.read_news_as_df(SRC_TRAIN_NEWS_PATH)
     train_news.reset_index(inplace=True)
     news_cat_map = dict(zip(train_news['id'], train_news['category']))
@@ -90,9 +92,28 @@ if MAIN_CATEGORIES:
 
     # train_user_df = MindHandler.read_behaviours_tsv(src_path=SRC_TRAIN_USER_PATH)
     train_user_df = pd.read_csv('/var/scratch/zta207/data/MINDsmall_train/behaviors.csv')
+    # add clicks and nonclicks
+    clicks_list = []
+    nonclicks_list = []
+    
     for idx, row in train_user_df.iterrows():
         user_id = row['user']
         history_str = row['history']
+        impression_str = row['impression']
+        
+        # add clicks and nonclicks
+        clicks = []
+        nonclicks = []
+        if not pd.isna(impression_str):
+            for item in impression_str.split(' '):
+                if item.endswith('-1'):
+                    clicks.append(item.rsplit('-', 1)[0])
+                elif item.endswith('-0'):
+                    nonclicks.append(item.rsplit('-', 1)[0])
+        clicks_list.append(' '.join(clicks))
+        nonclicks_list.append(' '.join(nonclicks))
+
+        # add main category from history
         if pd.isna(history_str):
             continue
         history_list = history_str.split(' ')
@@ -103,21 +124,39 @@ if MAIN_CATEGORIES:
         main_cat = max(set(cats), key=cats.count)
         user_main_category[user_id] = main_cat
     train_user_df['main_category'] = train_user_df['user'].map(user_main_category)
+    train_user_df['clicks'] = clicks_list
+    train_user_df['nonclicks'] = nonclicks_list
+    
     print('saving train user behavior')
-    train_user_df.to_csv(DST_TRAIN_USER_PATH2, index=False)
+    train_user_df.to_csv(DST_TRAIN_USER_PATH3, index=False)
 
 
-    print('computing main categories for test users...')
+    print('computing main categories and clicks for test users...')
     test_news = MindHandler.read_news_as_df(SRC_TEST_NEWS_PATH)
     test_news.reset_index(inplace=True)
     news_cat_map_test = dict(zip(test_news['id'], test_news['category']))
 
     user_main_category_test = {}
     test_user_df = pd.read_csv('/var/scratch/zta207/data/MINDsmall_dev/behaviors.csv')
+    clicks_list_test = []
+    nonclicks_list_test = []
 
     for idx, row in test_user_df.iterrows():
         user_id = row['user']
         history_str = row['history']
+        impression_str = row['impression']
+        
+        clicks = []
+        nonclicks = []
+        if not pd.isna(impression_str):
+            for item in impression_str.split(' '):
+                if item.endswith('-1'):
+                    clicks.append(item.rsplit('-', 1)[0])
+                elif item.endswith('-0'):
+                    nonclicks.append(item.rsplit('-', 1)[0])
+        clicks_list_test.append(' '.join(clicks))
+        nonclicks_list_test.append(' '.join(nonclicks))
+        
         if pd.isna(history_str):
             continue
         history_list = history_str.split(' ')
@@ -128,8 +167,10 @@ if MAIN_CATEGORIES:
         user_main_category_test[user_id] = main_cat
 
     test_user_df['main_category'] = test_user_df['user'].map(user_main_category_test)
+    test_user_df['clicks'] = clicks_list_test
+    test_user_df['nonclicks'] = nonclicks_list_test
     print('saving test user behavior')
-    test_user_df.to_csv(DST_TEST_USER_PATH2, index=False)
+    test_user_df.to_csv(DST_TEST_USER_PATH3, index=False)
 
 # pre-processing news
 

@@ -12,10 +12,11 @@ from os.path import join, exists
 from pandas import DataFrame
 import datetime
 from typing import Optional
+import pandas as pd
 
 from .evaluation import metrics as eval
 from . import utils
-from .utils import batch_to_device
+from .utils import batch_to_device, to_polar, plot_polar
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 
@@ -140,6 +141,7 @@ class BaseTrainer(ABC):
 
     def train(self):
         # TODO: evetually switch to logging and testing in step-wise periods?
+        
         for e in range(self.cfg.n_epochs):
             self.current_epoch = e
             print(f'\n Epoch {e}:')
@@ -218,6 +220,7 @@ class RankingTrainer(BaseTrainer):
         return return_dict
 
     def _after_test_iteration(self, results: list):
+        print('test iteration in ranking trainer')
         loss = np.array([d['loss'] for d in results])
         ndcg5 = np.array([d['ndcg@5'] for d in results])
         ndcg10 = np.array([d['ndcg@10'] for d in results])
@@ -436,54 +439,121 @@ class ContrastiveRankingTrainer(MSERankingTrainer):
                 'epoch_loss_cl': epoch_loss_cl,
                 'epoch': self.current_epoch
             })
-
+        print('test iteration in CL trainer')
         print(f"[Epoch {self.current_epoch}] total: {epoch_loss_total:.4f}, "
               f"rec: {epoch_loss_rec:.4f}, cl: {epoch_loss_cl:.4f}")
+        
+        # if self.cfg.get("plot_polar", False):
+        #     self._plot_polar_distribution()
+    
+    def _export_user_embeddings(self, stage='before_cl'):
+        self.model.eval()
+        all_user_embeds = []
+        with torch.no_grad():
+            for batch in tqdm(self.trainloader):
+                user_emb = self.model.get_user_embeddings(batch)  # (B, D)
+                # print(f"📝 batch['user_features'].keys(): {list(batch['user_features'].keys())}")
 
-    # def _visualize_user_embeddings(self, results):
-    #     all_embeds = []
-    #     all_labels = []
-    #
-    #     for r in results:
-    #         if 'user_embeddings' in r and 'main_category' in r:
-    #             all_embeds.append(r['user_embeddings'])  # shape: [D]
-    #             all_labels.append(r['main_category'])
-    #
-    #     if len(all_embeds) < 10:
-    #         print("Too few embeddings for visualization.")
-    #         return
-    #
-    #     embeds = np.stack(all_embeds)
-    #     tsne = TSNE(n_components=2, perplexity=30, init='random', random_state=42)
-    #     reduced = tsne.fit_transform(embeds)
-    #
-    #     fig, ax = plt.subplots(figsize=(6, 5))
-    #     for cat in set(all_labels):
-    #         idxs = [i for i, c in enumerate(all_labels) if c == cat]
-    #         ax.scatter(reduced[idxs, 0], reduced[idxs, 1], label=cat, alpha=0.6)
-    #     ax.legend()
-    #     ax.set_title("User Embedding t-SNE")
-    #
+                user_ids = [f"user_{i}" for i in range(user_emb.shape[0])] # batch user ids
+
+                user_emb = user_emb.cpu().numpy()  # (B, D)
+                for i in range(user_emb.shape[0]):
+                    embed_dict = {'user_id': user_ids[i]}
+                    embed_dict.update({f'dim_{j}': user_emb[i][j] for j in range(user_emb.shape[1])})
+                    all_user_embeds.append(embed_dict)
+
+                if self.cfg.debug: 
+                    break
+
+        out_dir = os.path.join(self.cfg.dir, self.cfg.name)
+        os.makedirs(out_dir, exist_ok=True)
+        out_csv = os.path.join(out_dir, f'{stage}_user_emb.csv')
+        pd.DataFrame(all_user_embeds).to_csv(out_csv, index=False)
+        print(f"✅ Saved user embeddings to {out_csv}")
+
+    def train(self):
+        # TODO: evetually switch to logging and testing in step-wise periods?
+        self._export_user_embeddings(stage='before_cl')
+        
+        for e in range(self.cfg.n_epochs):
+            self.current_epoch = e
+            print(f'\n Epoch {e}:')
+            print('training:')
+            train_results = self._train_iteration()
+            if (e + 1) % self.cfg.test_freq == 0\
+                or e == self.cfg.n_epochs - 1:
+                print('testing:')
+                test_results = self._test_iteration()
+            if self.cfg.debug:
+                print('debugging - interrupting after first epoch')
+                break
+        if self.cfg.n_epochs == 0:
+            test_results = self._test_iteration()
+        # self._after_training(
+        #     last_train_results=train_results,
+        #     last_test_results=test_results
+        # )
+        self._export_user_embeddings(stage='after_cl')
+
+        
+    # def _after_test_iteration(self, results: list):
+    #     print('test iteration in contrastive ranking trainer')
+
+    #     loss = np.array([d['loss'] for d in results])
+    #     ndcg5 = np.array([d['ndcg@5'] for d in results])
+    #     ndcg10 = np.array([d['ndcg@10'] for d in results])
+    #     rr = np.array([d['rr'] for d in results])
+    #     ctr = np.array([d['ctr@1'] for d in results])
+    #     acc = np.array([d['acc'] for d in results])
+    #     auc = np.array([d['auc'] for d in results])
+    #     rec = np.array([d['rec'] for d in results])
+    #     prec = np.array([d['prec'] for d in results])
+    #     epoch_loss = np.mean(loss)
+    #     epoch_ndcg5 = np.mean(ndcg5)
+    #     epoch_ndcg10 = np.mean(ndcg10)
+    #     epoch_mrr = np.mean(rr)
+    #     epoch_acc = np.mean(acc)
+    #     epoch_auc = np.mean(auc)
+    #     epoch_rec = np.mean(rec)
+    #     epoch_prec = np.mean(prec)
+    #     epoch_ctr = np.mean(ctr)
+    #     epoch_conf = np.sum([d['conf'] for d in results], axis=0)
+
+    #     scores = np.concatenate([d['scores'] for d in results])
+    #     targets = np.concatenate([d['targets'] for d in results])
+    #     self._save_scores(
+    #         targets=targets,
+    #         scores=scores,
+    #         stats={
+    #             'auc': auc,
+    #             'mrr': rr,
+    #             'ndcg@5': ndcg5,
+    #             'ndcg@10': ndcg10
+    #         })
+
     #     if self.cfg.wandb:
-    #         wandb.log({"user_embedding_tsne": wandb.Image(fig)})
-    #     plt.close(fig)
+    #         conf_table = wandb.Table(
+    #             columns=['0', '1'],
+    #             data=epoch_conf.tolist()
+    #         )
+    #         score_hist = wandb.Histogram(scores, num_bins=50)
+    #         wandb.log({
+    #             'test_loss': epoch_loss,
+    #             'ndcg@5': epoch_ndcg5,
+    #             'ndcg@10': epoch_ndcg10,
+    #             'mrr': epoch_mrr,
+    #             'ctr@1': epoch_ctr,
+    #             'auc': epoch_auc,
+    #             'acc': epoch_acc,
+    #             'rec': epoch_rec,
+    #             'prec': epoch_prec,
+    #             'conf': conf_table,
+    #             'scores': score_hist,
+    #             'epoch': self.current_epoch
+    #         })
 
-    def _after_test_iteration(self, results: list):
-        loss = np.mean([d['loss'] for d in results])
-        ndcg5 = np.mean([d['ndcg@5'] for d in results])
-        ndcg10 = np.mean([d['ndcg@10'] for d in results])
-        auc = np.mean([d['auc'] for d in results])
+    #     print(f'[Epoch CL {self.current_epoch}] test loss: {epoch_loss:.4f}, ndcg@5: {epoch_ndcg5:.4f}, '
+    #         f'ndcg@10: {epoch_ndcg10:.4f}, mrr: {epoch_mrr:.4f}, ctr@1: {epoch_ctr:.4f}, '
+    #         f'auc: {epoch_auc:.4f}, acc: {epoch_acc:.4f}, rec: {epoch_rec:.4f}, prec: {epoch_prec:.4f}')
 
-        if self.cfg.wandb:
-            wandb.log({
-                'val_loss': loss,
-                'val_ndcg@5': ndcg5,
-                'val_ndcg@10': ndcg10,
-                'val_auc': auc,
-                'epoch': self.current_epoch
-            })
-
-        print(f"[Eval {self.current_epoch}] loss: {loss:.4f}, ndcg@5: {ndcg5:.4f}, auc: {auc:.4f}")
-
-        if self.cfg.get("visualize_user_embeddings", False):
-            self._visualize_user_embeddings(results)
+            

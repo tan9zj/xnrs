@@ -28,9 +28,9 @@ class ParentRec(nn.Module):
         return_embeddings: bool = False
     ):
         # TODO: make this more general
-        h, hm = self.news_encoder(history)
-        c, _ = self.news_encoder(candidates)
-        u = self.user_encoder((h, hm), add_user_feats)
+        h, hm = self.news_encoder(history) # history news
+        c, _ = self.news_encoder(candidates) # candidate news
+        u = self.user_encoder((h, hm), add_user_feats) # user embedding through history
         r = self.rec_model(u, c)
         if return_embeddings:
             return r, u, c

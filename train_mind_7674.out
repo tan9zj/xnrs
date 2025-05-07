@@ -1,0 +1,46 @@
+loading config
+init logging
+init model
+init dataset (the first time this will take a while)
+init trainer
+starting training
+
+ Epoch 0:
+training:
+saving checkpoint
+train loss:  0.14811862
+testing:
+saving scores
+test loss: 0.1040, ndcg@5: 0.3465, mrr: 0.3628, ctr@1: 0.1887, auc: 0.6620, acc: 0.8951, rec: 0.0361, prec: 0.0283
+
+ Epoch 1:
+training:
+saving checkpoint
+train loss:  0.14290625
+testing:
+saving scores
+test loss: 0.0991, ndcg@5: 0.3500, mrr: 0.3680, ctr@1: 0.1983, auc: 0.6629, acc: 0.8977, rec: 0.0212, prec: 0.0228
+
+ Epoch 2:
+training:
+saving checkpoint
+train loss:  0.1413018
+testing:
+saving scores
+test loss: 0.1032, ndcg@5: 0.3523, mrr: 0.3690, ctr@1: 0.1956, auc: 0.6649, acc: 0.8926, rec: 0.0510, prec: 0.0521
+
+ Epoch 3:
+training:
+saving checkpoint
+train loss:  0.14045756
+testing:
+saving scores
+test loss: 0.1007, ndcg@5: 0.3557, mrr: 0.3722, ctr@1: 0.2011, auc: 0.6719, acc: 0.8942, rec: 0.0414, prec: 0.0439
+
+ Epoch 4:
+training:
+saving checkpoint
+train loss:  0.13958451
+testing:
+saving scores
+test loss: 0.1008, ndcg@5: 0.3589, mrr: 0.3744, ctr@1: 0.2013, auc: 0.6766, acc: 0.8906, rec: 0.0571, prec: 0.0589
