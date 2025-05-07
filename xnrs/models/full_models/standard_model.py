@@ -70,7 +70,7 @@ class StandardRec(ParentRec):
 
         return user_emb.squeeze(1)
     
-    def get_news_embeddings(self, batch: dict, mode: str = 'candidate') -> torch.Tensor:
+    def get_news_embeddings(self, batch: dict, mode: str = 'history') -> torch.Tensor:
         """
         Get news embeddings from the news encoder.
 

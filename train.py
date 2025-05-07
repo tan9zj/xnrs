@@ -58,6 +58,9 @@ def train(cfg_path: PathLike, debug: bool = False):
         train_ds, test_ds = AdressaHandler.init_datasets(cfg)
     else:
         raise ValueError('unknown dataset')
+    
+    # get news embeddings
+    # export_news_embeddings(cfg, model, train_ds)
 
     print('init trainer')
     # trainer = BCELogitsRankingTrainer(cfg, model, train_ds, test_ds)
