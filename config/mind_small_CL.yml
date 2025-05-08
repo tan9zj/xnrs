@@ -40,6 +40,7 @@ batch_size: 64
 shuffle_data: True
 n_epochs: 5
 # n_epochs: 1 
+# n_epochs: 1 
 test_freq: 1
 ckpt_freq: 1
 device: 'cuda:0'
@@ -49,10 +50,16 @@ apply_sigmoid: False
 load_article_ids: False
 # contrastive_temperature: 0.1
 contrastive_temperature: 0.08
+# contrastive_temperature: 0.1
+contrastive_temperature: 0.08
 #contrastive_lambda: 0.1
 contrastive_lambda: 0.01
 # contrastive_lambda: 0.005
+contrastive_lambda: 0.01
+# contrastive_lambda: 0.005
 
+visualize_user_embeddings: False
+plot_polar: True
 visualize_user_embeddings: False
 plot_polar: True
 
