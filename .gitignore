@@ -9,3 +9,5 @@
 checkpoints/
 experiments/
 build/
+*.out
+*.err
