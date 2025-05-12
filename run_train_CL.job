@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=train_mind
-#SBATCH --output=test_CL_plot_%j.out
-#SBATCH --error=test_CL_plot_%j.err
+#SBATCH --output=test_CL_baseline_%j.out
+#SBATCH --error=test_CL_baseline_%j.err
 #SBATCH --time=10:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=32

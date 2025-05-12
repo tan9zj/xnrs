@@ -473,7 +473,7 @@ class ContrastiveRankingTrainer(MSERankingTrainer):
 
     def train(self):
         # TODO: evetually switch to logging and testing in step-wise periods?
-        self._export_user_embeddings(stage='before_cl')
+        # self._export_user_embeddings(stage='before_cl')
         
         for e in range(self.cfg.n_epochs):
             self.current_epoch = e
@@ -489,11 +489,11 @@ class ContrastiveRankingTrainer(MSERankingTrainer):
                 break
         if self.cfg.n_epochs == 0:
             test_results = self._test_iteration()
-        # self._after_training(
-        #     last_train_results=train_results,
-        #     last_test_results=test_results
-        # )
-        self._export_user_embeddings(stage='after_cl')
+        self._after_training(
+            last_train_results=train_results,
+            last_test_results=test_results
+        )
+        # self._export_user_embeddings(stage='after_cl')
 
         
     # def _after_test_iteration(self, results: list):
