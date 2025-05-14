@@ -36,9 +36,8 @@ DEVICE = 'cuda:0'
 SRC_TRAIN_NEWS_PATH = '/var/scratch/zta207/data/MINDsmall_train/news.tsv'
 DST_TRAIN_NEWS_PATH = f'/var/scratch/zta207/data/MINDsmall_train/news_full_{ABBR}.pkl'
 SRC_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDsmall_train/behaviors.tsv'
-DST_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDsmall_train/behaviors.csv'
-DST_TRAIN_USER_PATH2 = '/var/scratch/zta207/data/MINDsmall_train/behaviors2.csv' # for main category
-DST_TRAIN_USER_PATH3 = '/var/scratch/zta207/data/MINDsmall_train/behaviors3.csv'
+# DST_TRAIN_USER_PATH3 = '/var/scratch/zta207/data/MINDsmall_train/behaviors3.csv' # main category from history
+DST_TRAIN_USER_PATH4 = '/var/scratch/zta207/data/MINDsmall_train/behaviors4.csv' # main category from history + clicks impression
 
 # SRC_TEST_NEWS_PATH = '/var/scratch/zta207/data/MINDlarge_dev/news.tsv'
 # DST_TEST_NEWS_PATH = f'/var/scratch/zta207/data/MINDlarge_dev/news_full_{ABBR}.pkl'
@@ -49,8 +48,8 @@ SRC_TEST_NEWS_PATH = '/var/scratch/zta207/data/MINDsmall_dev/news.tsv'
 DST_TEST_NEWS_PATH = f'/var/scratch/zta207/data/MINDsmall_dev/news_full_{ABBR}.pkl'
 SRC_TEST_USER_PATH = '/var/scratch/zta207/data/MINDsmall_dev/behaviors.tsv'
 DST_TEST_USER_PATH = '/var/scratch/zta207/data/MINDsmall_dev/behaviors.csv'
-DST_TEST_USER_PATH2 = '/var/scratch/zta207/data/MINDsmall_dev/behaviors2.csv'
-DST_TEST_USER_PATH3 = '/var/scratch/zta207/data/MINDsmall_dev/behaviors3.csv'
+# DST_TEST_USER_PATH3 = '/var/scratch/zta207/data/MINDsmall_dev/behaviors3.csv'
+DST_TEST_USER_PATH4 = '/var/scratch/zta207/data/MINDsmall_dev/behaviors4.csv' # main category from history + clicks impression
 
 CONFIG_PATH = f'/var/scratch/zta207/data/{ABBR}_config.json'
 
@@ -114,10 +113,10 @@ if MAIN_CATEGORIES:
         nonclicks_list.append(' '.join(nonclicks))
 
         # add main category from history
-        if pd.isna(history_str):
-            continue
-        history_list = history_str.split(' ')
-        cats = [news_cat_map.get(news_id) for news_id in history_list if news_id in news_cat_map]
+        history_list = [] if pd.isna(history_str) else history_str.split(' ')
+        combined_news = history_list + clicks
+        # cats = [news_cat_map.get(news_id) for news_id in history_list if news_id in news_cat_map]
+        cats = [news_cat_map.get(news_id) for news_id in combined_news if news_id in news_cat_map]
         if not cats:
             continue
 
@@ -128,7 +127,7 @@ if MAIN_CATEGORIES:
     train_user_df['nonclicks'] = nonclicks_list
     
     print('saving train user behavior')
-    train_user_df.to_csv(DST_TRAIN_USER_PATH3, index=False)
+    train_user_df.to_csv(DST_TRAIN_USER_PATH4, index=False)
 
 
     print('computing main categories and clicks for test users...')
@@ -157,10 +156,10 @@ if MAIN_CATEGORIES:
         clicks_list_test.append(' '.join(clicks))
         nonclicks_list_test.append(' '.join(nonclicks))
         
-        if pd.isna(history_str):
-            continue
-        history_list = history_str.split(' ')
-        cats = [news_cat_map_test.get(news_id) for news_id in history_list if news_id in news_cat_map_test]
+        history_list = [] if pd.isna(history_str) else history_str.split(' ')
+        combined_news = history_list + clicks
+        # cats = [news_cat_map_test.get(news_id) for news_id in history_list if news_id in news_cat_map_test]
+        cats = [news_cat_map_test.get(news_id) for news_id in combined_news if news_id in news_cat_map_test]
         if not cats:
             continue
         main_cat = max(set(cats), key=cats.count)
@@ -170,7 +169,7 @@ if MAIN_CATEGORIES:
     test_user_df['clicks'] = clicks_list_test
     test_user_df['nonclicks'] = nonclicks_list_test
     print('saving test user behavior')
-    test_user_df.to_csv(DST_TEST_USER_PATH3, index=False)
+    test_user_df.to_csv(DST_TEST_USER_PATH4, index=False)
 
 # pre-processing news
 

@@ -2,10 +2,12 @@
 dataset: mind
 train_news_data_path: /var/scratch/zta207/data/MINDsmall_train/news_full_smpnet.pkl
 #train_user_data_path: /var/scratch/zta207/data/MINDsmall_train/behaviors.csv
-train_user_data_path: /var/scratch/zta207/data/MINDsmall_train/behaviors3.csv
+# train_user_data_path: /var/scratch/zta207/data/MINDsmall_train/behaviors3.csv # history only
+train_user_data_path: /var/scratch/zta207/data/MINDsmall_train/behaviors4.csv # history with clicks
 test_news_data_path: /var/scratch/zta207/data/MINDsmall_dev/news_full_smpnet.pkl
 #test_user_data_path: /var/scratch/zta207/data/MINDsmall_dev/behaviors.csv
-test_user_data_path: /var/scratch/zta207/data/MINDsmall_dev/behaviors3.csv
+# test_user_data_path: /var/scratch/zta207/data/MINDsmall_dev/behaviors3.csv # history only
+test_user_data_path: /var/scratch/zta207/data/MINDsmall_dev/behaviors4.csv # history with clicks
 min_hist_len: 1
 # n_categories:
 # n_subcategories:
@@ -38,7 +40,7 @@ num_workers: 0
 n_negatives: 4
 batch_size: 64
 shuffle_data: True
-n_epochs: 5
+n_epochs: 10
 # n_epochs: 1 
 # n_epochs: 1 
 test_freq: 1
@@ -68,6 +70,6 @@ wandb: False
 mode: offline
 project: xnrs
 tags: [mind, standard]
-name: mind_small_CL_baseline
+name: mind_small_CL_historty_w_clicks
 dir: /var/scratch/zta207/experiments
-notes: test CL 
+notes: test CL with history and clicks
