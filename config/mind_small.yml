@@ -38,7 +38,7 @@ num_workers: 0
 n_negatives: 4
 batch_size: 64
 shuffle_data: True
-n_epochs: 5
+n_epochs: 10
 test_freq: 1
 ckpt_freq: 1
 device: 'cuda:0'

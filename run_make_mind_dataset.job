@@ -6,7 +6,8 @@
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=32
 #SBATCH --gres=gpu:1
-#SBATC --nodelist=gpunode
+#SBATCH --constraint=gpunode
+
 source /var/scratch/zta207/miniconda3/etc/profile.d/conda.sh
 
 conda activate xfair

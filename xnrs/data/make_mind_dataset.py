@@ -37,7 +37,7 @@ SRC_TRAIN_NEWS_PATH = '/var/scratch/zta207/data/MINDsmall_train/news.tsv'
 DST_TRAIN_NEWS_PATH = f'/var/scratch/zta207/data/MINDsmall_train/news_full_{ABBR}.pkl'
 SRC_TRAIN_USER_PATH = '/var/scratch/zta207/data/MINDsmall_train/behaviors.tsv'
 # DST_TRAIN_USER_PATH3 = '/var/scratch/zta207/data/MINDsmall_train/behaviors3.csv' # main category from history
-DST_TRAIN_USER_PATH4 = '/var/scratch/zta207/data/MINDsmall_train/behaviors4.csv' # main category from history + clicks impression
+DST_TRAIN_USER_PATH4 = '/var/scratch/zta207/data/MINDsmall_train/behaviors4.csv' # main category and theme from history + clicks impression
 
 # SRC_TEST_NEWS_PATH = '/var/scratch/zta207/data/MINDlarge_dev/news.tsv'
 # DST_TEST_NEWS_PATH = f'/var/scratch/zta207/data/MINDlarge_dev/news_full_{ABBR}.pkl'
@@ -57,6 +57,29 @@ CATEGORY_INDEX_PATH = f'/var/scratch/zta207/data/category_index.pkl'
 SUBCATEGORY_INDEX_PATH = f'/var/scratch/zta207/data/sub_category_index.pkl'
 USER_INDEX_PATH = f'/var/scratch/zta207/data/user_index.pkl'
 
+CATEGORY_THEME_MAP = {
+    "news": "news",
+    "weather": "news", 
+
+    "foodanddrink": "lifestyle",
+    "health": "lifestyle",
+    "lifestyle": "lifestyle",
+    "travel": "lifestyle",
+
+    "video": "entertainment",
+    "entertainment": "entertainment",
+    "kids": "entertainment",
+    "music": "entertainment",
+    "tv": "entertainment",
+    "movies": "entertainment",
+    "autos": "entertainment",
+
+    "northamerica": "world",
+    "middleeast": "world",
+
+    "finance": "finance",
+    "sports": "sports"
+}
 
 # transforming beahiours
 
@@ -88,6 +111,7 @@ if MAIN_CATEGORIES:
     news_cat_map = dict(zip(train_news['id'], train_news['category']))
 
     user_main_category = {}
+    user_main_theme = {}
 
     # train_user_df = MindHandler.read_behaviours_tsv(src_path=SRC_TRAIN_USER_PATH)
     train_user_df = pd.read_csv('/var/scratch/zta207/data/MINDsmall_train/behaviors.csv')
@@ -117,12 +141,26 @@ if MAIN_CATEGORIES:
         combined_news = history_list + clicks
         # cats = [news_cat_map.get(news_id) for news_id in history_list if news_id in news_cat_map]
         cats = [news_cat_map.get(news_id) for news_id in combined_news if news_id in news_cat_map]
-        if not cats:
-            continue
-
+        themes = [CATEGORY_THEME_MAP.get(cat) for cat in cats if cat in CATEGORY_THEME_MAP]
+        # print(f"[DEBUG] user_id={user_id}")
+        # print(f"[DEBUG] history_list={history_list}")
+        # print(f"[DEBUG] clicks={clicks}")
+        # print(f"[DEBUG] combined_news={combined_news}")
+        # print(f"[DEBUG] cats={cats}")
+        # print(f"[DEBUG] mapped themes (raw)={[cat.lower() if isinstance(cat, str) else cat for cat in cats]}")
+        # print(f"[DEBUG] themes={themes}")
+        
+        main_theme = max(set(themes), key=themes.count)
+        user_main_theme[user_id] = main_theme
+        
         main_cat = max(set(cats), key=cats.count)
         user_main_category[user_id] = main_cat
+
+ 
+        
     train_user_df['main_category'] = train_user_df['user'].map(user_main_category)
+    train_user_df['main_theme'] = train_user_df['user'].map(user_main_theme)
+
     train_user_df['clicks'] = clicks_list
     train_user_df['nonclicks'] = nonclicks_list
     
@@ -136,6 +174,7 @@ if MAIN_CATEGORIES:
     news_cat_map_test = dict(zip(test_news['id'], test_news['category']))
 
     user_main_category_test = {}
+    user_main_theme_test = {}
     test_user_df = pd.read_csv('/var/scratch/zta207/data/MINDsmall_dev/behaviors.csv')
     clicks_list_test = []
     nonclicks_list_test = []
@@ -160,17 +199,24 @@ if MAIN_CATEGORIES:
         combined_news = history_list + clicks
         # cats = [news_cat_map_test.get(news_id) for news_id in history_list if news_id in news_cat_map_test]
         cats = [news_cat_map_test.get(news_id) for news_id in combined_news if news_id in news_cat_map_test]
-        if not cats:
-            continue
+        themes = [CATEGORY_THEME_MAP.get(c) for c in cats if c in CATEGORY_THEME_MAP]
+        
         main_cat = max(set(cats), key=cats.count)
         user_main_category_test[user_id] = main_cat
 
+        main_theme = max(set(themes), key=themes.count)
+        user_main_theme_test[user_id] = main_theme
+
     test_user_df['main_category'] = test_user_df['user'].map(user_main_category_test)
+    test_user_df['main_theme'] = test_user_df['user'].map(user_main_theme_test)
+
     test_user_df['clicks'] = clicks_list_test
     test_user_df['nonclicks'] = nonclicks_list_test
     print('saving test user behavior')
     test_user_df.to_csv(DST_TEST_USER_PATH4, index=False)
 
+
+    
 # pre-processing news
 
 print('init transformer')

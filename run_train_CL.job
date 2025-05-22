@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=train_mind
-#SBATCH --output=test_CL_history_with_clicks_%j.out
-#SBATCH --error=test_CL_history_with_clicks_%j.err
+#SBATCH --output=test_CL_cat_h_%j.out
+#SBATCH --error=test_CL_cat_h_%j.err
 #SBATCH --time=24:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=32
 #SBATCH --gres=gpu:1
+#SBATCH --mem=32G
 #SBATCH --constraint=gpunode
-#SBATCH --mem=32G  
 
 source /var/scratch/zta207/miniconda3/etc/profile.d/conda.sh
 conda activate xfair

@@ -52,24 +52,19 @@ apply_sigmoid: False
 load_article_ids: False
 # contrastive_temperature: 0.1
 contrastive_temperature: 0.08
-# contrastive_temperature: 0.1
-contrastive_temperature: 0.08
+
 #contrastive_lambda: 0.1
 contrastive_lambda: 0.01
 # contrastive_lambda: 0.005
-contrastive_lambda: 0.01
-# contrastive_lambda: 0.005
 
-visualize_user_embeddings: False
-plot_polar: True
-visualize_user_embeddings: False
-plot_polar: True
+
+
 
 # logging:
 wandb: False
 mode: offline
 project: xnrs
 tags: [mind, standard]
-name: mind_small_CL_historty_w_clicks
+name: mind_small_CL_theme
 dir: /var/scratch/zta207/experiments
-notes: test CL with history and clicks
+notes: test CL with theme, history 

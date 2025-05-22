@@ -207,6 +207,7 @@ class RankingTrainer(BaseTrainer):
             'ndcg@10': eval.ndcg_score(t, s, k=10),
             'rr': eval.rr_score(t, s),
             'ctr@1': eval.ctr_score(t, s, k=1),
+            'ctr@10': eval.ctr_score(t, s, k=10),
             'auc': eval.auc_score(t, s),
             'acc': eval.acc_score(t, s),
             'rec': eval.recall_score(t, s), 
@@ -225,7 +226,8 @@ class RankingTrainer(BaseTrainer):
         ndcg5 = np.array([d['ndcg@5'] for d in results])
         ndcg10 = np.array([d['ndcg@10'] for d in results])
         rr = np.array([d['rr'] for d in results])
-        ctr = np.array([d['ctr@1'] for d in results])
+        ctr1 = np.array([d['ctr@1'] for d in results])
+        ctr10 = np.array([d['ctr@10'] for d in results])
         acc = np.array([d['acc'] for d in results])
         auc = np.array([d['auc'] for d in results])
         rec = np.array([d['rec'] for d in results])
@@ -238,7 +240,8 @@ class RankingTrainer(BaseTrainer):
         epoch_auc = np.mean(auc)
         epoch_rec = np.mean(rec)
         epoch_prec = np.mean(prec)
-        epoch_ctr = np.mean(ctr)
+        epoch_ctr1 = np.mean(ctr)
+        epoch_ctr10 = np.mean(ctr10)
         epoch_conf = np.sum([d['conf'] for d in results], axis=0)
         scores = np.concatenate([d['scores'] for d in results])
         targets = np.concatenate([d['targets'] for d in results])
@@ -262,7 +265,8 @@ class RankingTrainer(BaseTrainer):
                 'ndcg@5': epoch_ndcg5,
                 'ndcg@10': epoch_ndcg10,
                 'mrr': epoch_mrr,
-                'ctr@1': epoch_ctr,
+                'ctr@1': epoch_ctr1,
+                'ctr@10': epoch_ctr10,
                 'auc': epoch_auc,
                 'acc': epoch_acc,
                 'rec': epoch_rec,
@@ -271,10 +275,11 @@ class RankingTrainer(BaseTrainer):
                 'scores': score_hist,
                 'epoch': self.current_epoch
                 })
-        print(f'test loss: {epoch_loss:.4f}, ndcg@5: {epoch_ndcg5:.4f}, '\
-                + f'mrr: {epoch_mrr:.4f}, ctr@1: {epoch_ctr:.4f}, auc: {epoch_auc:.4f}, '\
-                + f'acc: {epoch_acc:.4f}, rec: {epoch_rec:.4f}, prec: {epoch_prec:.4f}'
-            )
+            # TODO: add ndcg@10 and ctr@10
+        print(f'test loss: {epoch_loss:.4f}, ndcg@5: {epoch_ndcg5:.4f}, ndcg@10: {epoch_ndcg10:.4f}, '
+                f'mrr: {epoch_mrr:.4f}, ctr@1: {epoch_ctr1:.4f}, ctr@10: {epoch_ctr10:.4f}, '
+                f'auc: {epoch_auc:.4f}, acc: {epoch_acc:.4f}, rec: {epoch_rec:.4f}, prec: {epoch_prec:.4f}')
+
 
 
 class BCERankingTrainer(RankingTrainer):
@@ -364,7 +369,10 @@ class ContrastiveRankingTrainer(MSERankingTrainer):
 
         user_embeddings = self.model.get_user_embeddings(batch) # shape: [B, D]
 
-        main_cats = batch['main_category']
+        # main_cats = batch['main_category']
+        # print(batch.keys())
+
+        main_cats = batch['main_theme']
         unique_cats = list(set(main_cats))
         cat_to_idx = {cat: idx for idx, cat in enumerate(unique_cats)}
         cat_labels = torch.tensor([cat_to_idx[c] for c in main_cats]).to(self.device)  # shape: [B]

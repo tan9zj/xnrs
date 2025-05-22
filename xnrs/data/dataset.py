@@ -49,6 +49,7 @@ class NewsRecDataset(Dataset):
         
         session = self.uds[idx]
         history = session['history']
+        
 
         if self.mode == 'train':
             # one pos and k neg for training
@@ -151,6 +152,7 @@ class NewsRecDataset(Dataset):
 
         # add main_category into batch for CL
         return_dict['main_category'] = session['main_category']
+        return_dict['main_theme'] = session['main_theme']
 
         if return_news:  # for additional features
             return return_dict, hist_features, pos_features, neg_features
