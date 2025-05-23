@@ -11,4 +11,3 @@ experiments/
 build/
 *.out
 *.err
-results.md

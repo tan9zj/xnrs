@@ -65,6 +65,6 @@ wandb: False
 mode: offline
 project: xnrs
 tags: [mind, standard]
-name: mind_small_CL_theme
+name: mind_small_CL_theme_hwc
 dir: /var/scratch/zta207/experiments
-notes: test CL with theme, history 
+notes: test CL with theme, history with clicks

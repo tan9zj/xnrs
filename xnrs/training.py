@@ -240,7 +240,7 @@ class RankingTrainer(BaseTrainer):
         epoch_auc = np.mean(auc)
         epoch_rec = np.mean(rec)
         epoch_prec = np.mean(prec)
-        epoch_ctr1 = np.mean(ctr)
+        epoch_ctr1 = np.mean(ctr1)
         epoch_ctr10 = np.mean(ctr10)
         epoch_conf = np.sum([d['conf'] for d in results], axis=0)
         scores = np.concatenate([d['scores'] for d in results])
