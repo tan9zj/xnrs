@@ -1,0 +1,40 @@
+#!/bin/bash
+#SBATCH --job-name=tune_cl
+#SBATCH --output=logs/tune_cl_%j.out
+#SBATCH --error=logs/tune_cl_%j.err
+#SBATCH --time=72:00:00
+#SBATCH -N 1
+#SBATCH --ntasks-per-node=32
+#SBATCH --gres=gpu:1
+#SBATCH --mem=32G
+#SBATCH --constraint=gpunode
+
+source /var/scratch/zta207/miniconda3/etc/profile.d/conda.sh
+conda activate xfair
+module load cuda11.7/toolkit/11.7
+
+cd /home/zta207/xnrs
+mkdir -p config logs
+
+# grid search
+for temp in 0.06 0.08 0.1; do
+  for lamb in 0.005 0.01 0.02; do
+    cfg_in=config/mind_small_CL.yml
+    cfg_out=config/mind_small_CL_t${temp}_l${lamb}.yml
+
+    cp $cfg_in $cfg_out
+
+    # change temperature and lambda
+    yq -i -y '.contrastive_temperature = '"$temp" "$cfg_out"
+    yq -i -y '.contrastive_lambda = '"$lamb" "$cfg_out"
+    yq -i -y '.name = "mind_small_CL_t'"$temp"'_l'"$lamb"'"' "$cfg_out"
+
+    # echo "🔍 Verifying config: $cfg_out"
+    # yq '.contrastive_temperature, .contrastive_lambda, .name' "$cfg_out"
+    # echo ""
+
+
+    echo "🚀 Training temp=$temp lambda=$lamb"
+    python train.py --config $cfg_out
+  done
+done

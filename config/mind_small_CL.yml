@@ -40,8 +40,8 @@ num_workers: 0
 n_negatives: 4
 batch_size: 64
 shuffle_data: True
-n_epochs: 10
-# n_epochs: 1 
+# n_epochs: 10
+n_epochs: 5
 # n_epochs: 1 
 test_freq: 1
 ckpt_freq: 1
@@ -65,7 +65,7 @@ wandb: False
 mode: offline
 project: xnrs
 tags: [mind, standard]
-# name: mind_small_CL_theme_hwc
-name: mind_small_news
+name: mind_small_CL_theme_tuning
+# name: mind_small_news
 dir: /var/scratch/zta207/experiments
 notes: test CL with theme, history with clicks
