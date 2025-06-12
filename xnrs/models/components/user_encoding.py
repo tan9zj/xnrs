@@ -9,7 +9,7 @@ class UserEncoder(nn.Module):
         pooler: nn.Module, 
         p_dropout: float,
         emb_dim: Optional[int] = None,
-        # out_dim: Optional[int] = None,
+        out_dim: Optional[int] = None,
         att: Optional[nn.Module] = None,
         head: bool = False,
         activation: nn.Module = nn.ReLU(),
@@ -21,15 +21,31 @@ class UserEncoder(nn.Module):
         self.dropout = nn.Dropout(p=p_dropout)
         self.att = att
         self.pooler = pooler
+        
+        # for CL
+        # if head:
+        #     assert emb_dim is not None
+        #     # assert out_dim is not None
+        #     # self.head = nn.Linear(emb_dim, emb_dim, bias=False)
+        #     self.head = nn.Sequential(
+        #         nn.Linear(emb_dim, emb_dim, bias=bias),
+        #         activation,
+        #         nn.Linear(emb_dim, emb_dim, bias=bias)
+        #     )
+        # LSTUR NRMS NAML 
         if head:
             assert emb_dim is not None
-            # assert out_dim is not None
-            # self.head = nn.Linear(emb_dim, emb_dim, bias=False)
+            assert out_dim is not None
             self.head = nn.Sequential(
-                nn.Linear(emb_dim, emb_dim, bias=bias),
+                nn.Linear(emb_dim, out_dim, bias=bias),
                 activation,
-                nn.Linear(emb_dim, emb_dim, bias=bias)
+                nn.Linear(out_dim, out_dim, bias=bias)
             )
+            self.output_dim = out_dim
+        else:
+            self.head = nn.Identity()
+            self.output_dim = emb_dim
+
         
     def forward(
         self, 

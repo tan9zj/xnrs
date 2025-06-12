@@ -43,7 +43,10 @@ test_freq: 1
 ckpt_freq: 1
 device: 'cuda:0'
 lr: 0.0001
-random_seed: 0
+# random_seed: 0 
+# random_seed: 1
+# random_seed: 8
+random_seed: 12
 apply_sigmoid: False
 load_article_ids: False
 contrastive_temperature: 0.1
@@ -55,6 +58,6 @@ wandb: False
 mode: offline
 project: xnrs
 tags: [mind, standard]
-name: mind_small_baseline
+name: mind_small_baseline_2
 dir: /var/scratch/zta207/experiments
 notes: standard model on mind small dataset

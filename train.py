@@ -14,6 +14,9 @@ from xnrs.data import make_mind_data
 from xnrs.data import AdressaHandler
 from xnrs.training import BCELogitsRankingTrainer, MSERankingTrainer, ContrastiveRankingTrainer
 
+
+from xnrs.models.full_models import CAUM, LSTUR, NPA, NRMS, NAML, SmallNAML
+
 def train(cfg_path: PathLike, debug: bool = False):
 
     print('loading config')

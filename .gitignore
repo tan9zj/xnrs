@@ -11,3 +11,5 @@ experiments/
 build/
 *.out
 *.err
+logs/
+config/mind_small_CL_t*

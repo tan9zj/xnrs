@@ -64,6 +64,11 @@ class NAML(nn.Module):
         ):
         # TODO: moving to device should not be done here
         device = next(self.parameters()).device
+        # print(" Max category index (hist):", hist_ctg.max().item())
+        # print(" Max subcategory index (hist):", hist_subctg.max().item())
+        # print(" Max category index (cand):", cand_ctg.max().item())
+        # print(" Max subcategory index (cand):", cand_subctg.max().item())
+
 
         b, nh, s, d = hist_title_features[0].shape
         nc = cand_title_features[0].shape[1]
@@ -80,8 +85,17 @@ class NAML(nn.Module):
         hist_subctg_emb = self.subcat_fc(self.subcat_embedder(hist_subctg.to(device)))
         cand_subctg_emb = self.subcat_fc(self.subcat_embedder(cand_subctg.to(device)))
 
-        hist = torch.stack([hist_title_emb, hist_abstract_emb, hist_ctg_emb, hist_subctg_emb], dim=2)
-        cand = torch.stack([cand_title_emb, cand_abstract_emb, cand_ctg_emb, cand_subctg_emb], dim=2)
+        # debug
+        # print("hist_title_emb", hist_title_emb.shape)
+        # print("hist_abstract_emb", hist_abstract_emb.shape)
+        # print("hist_ctg_emb", hist_ctg_emb.shape)
+        # print("hist_subctg_emb", hist_subctg_emb.shape)
+
+        hist = torch.cat([hist_title_emb, hist_abstract_emb, hist_ctg_emb, hist_subctg_emb], dim=2)
+        cand = torch.cat([cand_title_emb, cand_abstract_emb, cand_ctg_emb, cand_subctg_emb], dim=2)
+        
+        # hist = torch.stack([hist_title_emb, hist_abstract_emb, hist_ctg_emb, hist_subctg_emb], dim=2)
+        # cand = torch.stack([cand_title_emb, cand_abstract_emb, cand_ctg_emb, cand_subctg_emb], dim=2)
 
         hist = hist.reshape((b * nh, 4, self.emb_dim))
         cand = cand.reshape((b * nc, 4, self.emb_dim))
@@ -96,6 +110,41 @@ class NAML(nn.Module):
         score = self.rec_model(urep, cand)
         
         return score
+    def get_user_embeddings(self, batch: dict):
+        """
+        user embedding (urep)，shape [B, D]
+        """
+        device = next(self.parameters()).device
+
+        # history 
+        hist_title_feats = batch['user_features']['history']['title_emb']
+        hist_abstract_feats = batch['user_features']['history']['abstract_emb']
+        hist_ctg = batch['user_features']['history']['category_index']
+        hist_subctg = batch['user_features']['history']['subcategory_index']
+
+        # encode title & abstract
+        hist_title_emb, hist_mask = self.title_encoder(hist_title_feats)
+        hist_abstract_emb, _ = self.body_encoder(hist_abstract_feats)
+
+        # category embedding 
+        hist_ctg_emb = self.cat_fc(self.cat_embedder(hist_ctg.to(device)))
+        hist_subctg_emb = self.subcat_fc(self.subcat_embedder(hist_subctg.to(device)))
+
+        # cat + feature_pooler
+        # concat / reshape / pooler
+        b, nh, _ = hist_title_emb.shape
+        emb_dim = self.emb_dim
+        hist = torch.cat([
+            hist_title_emb,
+            hist_abstract_emb,
+            hist_ctg_emb,
+            hist_subctg_emb
+        ], dim=2).view(b * nh, 4, emb_dim)
+        hist = self.feature_pooler(hist).view(b, nh, emb_dim)
+
+        # user encoding
+        urep = self.user_encoder(hist, hist_mask)
+        return urep
 
     def forward(self, batch: dict):
         return self._forward(

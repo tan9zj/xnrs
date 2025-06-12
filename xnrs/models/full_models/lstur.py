@@ -61,6 +61,23 @@ class LSTUR(nn.Module):
             cand_subcat_idxs=cand_subcat_idxs,
             return_embeddings=return_embeddings
         )
+    # get user embeddings
+    def get_user_embeddings(self, batch: dict) -> torch.Tensor:
+        """Return user embeddings for contrastive/BPR/MSE trainers."""
+        if 'subcategory_index' in self.cfg.catg_features:
+            hist_subcat_idxs = batch['user_features']['history']['subcategory_index']
+        else:
+            hist_subcat_idxs = None
+
+        h, hm = self.news_encoder(
+            title_features=batch['user_features']['history']['title_emb'],
+            cat_idxs=batch['user_features']['history']['category_index'],
+            subcat_idxs=hist_subcat_idxs
+        )
+        user_ids = batch['user_features']['other']['user_index']
+        u = self.user_encoder((h, hm), user_ids)  # shape: [B, 1, D]
+        return u.squeeze(1)  # shape: [B, D]
+
 
 
 class LSTURUserEncoder(nn.Module):
@@ -104,6 +121,12 @@ class LSTURUserEncoder(nn.Module):
         user_ids: torch.tensor
     ):
 
+        # print(" user_id max:", user_ids.max().item())
+        # print(" user_id min:", user_ids.min().item())
+        # print(" user_id shape:", user_ids.shape)
+        # print(" embedding size:", self.long_term_encoder.num_embeddings)
+
+        
         if self.cfg.long_term_method == 'mean':
             u_lt = self.long_term_encoder(history_features)
             u_lt = u_lt.squeeze(1)
@@ -171,6 +194,9 @@ class LSTURNewsEncoder(nn.Module):
         cat_idxs: torch.tensor,
         subcat_idxs: Optional[torch.tensor]
     ):
+        # print("[debug] cat_idxs max:", cat_idxs.max().item())
+        # print("[debug] cat_embedder size:", self.cat_embedder.num_embeddings)
+
         title_emb, m = self.title_encoder(title_features)
         cat_emb = self.cat_embedder(cat_idxs)
         emb = torch.cat([title_emb, cat_emb], dim=2)

@@ -194,14 +194,20 @@ class RankingTrainer(BaseTrainer):
         # TODO combine this with train step in forward
         t = batch['targets'].to(self.device)
         s = self.forward(batch)
+        
         if 'weights' in batch.keys():
             w = batch['weights'].to(self.device)
             loss = self.L(s, t, w)
         else:
             loss = self.L(s, t)
+            
         loss = loss.cpu().numpy()
         t = t.cpu().squeeze().numpy()
         s = s.cpu().squeeze().numpy()
+        
+        # replace NaN and inf values in scores
+        s = np.nan_to_num(s, nan=0.0, posinf=1.0, neginf=0.0)
+        
         return_dict = {
             'ndcg@5': eval.ndcg_score(t, s, k=5),
             'ndcg@10': eval.ndcg_score(t, s, k=10),
@@ -396,8 +402,15 @@ class ContrastiveRankingTrainer(MSERankingTrainer):
             embeddings: B,D
             labels: B
         """
-        embeddings = nn.functional.normalize(embeddings, dim=-1)
-        sim_matrix = torch.matmul(embeddings, embeddings.T)
+        # old CL
+        # embeddings = nn.functional.normalize(embeddings, dim=-1)
+        # sim_matrix = torch.matmul(embeddings, embeddings.T)
+        
+        # for NAML
+        if embeddings.dim() > 2:
+            embeddings = embeddings.view(embeddings.size(0), -1)  # flatten if needed
+        
+        sim_matrix = embeddings @ embeddings.mT
 
         B = embeddings.size(0)
         loss = 0.0

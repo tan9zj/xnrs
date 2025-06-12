@@ -1,12 +1,11 @@
 #!/bin/bash
-#SBATCH --job-name=train_mind
-#SBATCH --output=test_CL_catg_hwc_%j.out
-#SBATCH --error=test_CL_catg_hwc_%j.err
-#SBATCH --time=24:00:00
+#SBATCH --job-name=train_NRMS
+#SBATCH --output=train_mind_NRMS_%j.out
+#SBATCH --error=train_mind_NRMS_%j.err
+#SBATCH --time=10:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=32
 #SBATCH --gres=gpu:1
-#SBATCH --mem=32G
 #SBATCH --constraint=gpunode
 
 source /var/scratch/zta207/miniconda3/etc/profile.d/conda.sh
@@ -14,7 +13,6 @@ conda activate xfair
 
 module load cuda11.7/toolkit/11.7
 
-
 cd /home/zta207/xnrs
 
-python train.py --config config/mind_small_CL.yml
+python train.py --config config/mind_small_NRMS.yml

@@ -1,49 +1,42 @@
 # data:
 dataset: mind
 train_news_data_path: /var/scratch/zta207/data/MINDsmall_train/news_full_smpnet.pkl
-#train_user_data_path: /var/scratch/zta207/data/MINDsmall_train/behaviors.csv
 train_user_data_path: /var/scratch/zta207/data/MINDsmall_train/behaviors4.csv
 test_news_data_path: /var/scratch/zta207/data/MINDsmall_dev/news_full_smpnet.pkl
-#test_user_data_path: /var/scratch/zta207/data/MINDsmall_dev/behaviors.csv
 test_user_data_path: /var/scratch/zta207/data/MINDsmall_dev/behaviors4.csv
 min_hist_len: 1
-n_categories: 19
-# n_categories: 17
-n_subcategories: 264
-# n_users: 50000
-n_users: 703789
 
 # model:
-model: 'LSTUR'
-base_model: 'LSTUR'
-long_short_term_method: 'con'
-# long_term_method: 'embedding'
-long_term_method: 'mean'
-p_user_dropout: 0.07
+model: 'NAML'
+base_model: 'NAML'
+# model: 'smallNAML'
+# base_model: 'smallNAML'
 scoring: 'dot'
-text_features: ['title_emb']
-catg_features: ['category_index'] # ['category_index']
-user_features: ['user_index']  # ['user_index']
+text_features: ['title_emb', 'abstract_emb']
+catg_features: ['category_index', 'subcategory_index']
+#  for small naml 
+# text_features: ['title_emb'] 
+# catg_features: ['category_index']
+n_categories: 19
+n_subcategories: 300
+# n_users: 50000
+n_users: 703789
+user_features: []
 add_features: []
-# news
 title_emb_dim: 256
-# total_emb_dim: 256
-total_emb_dim: 272
+total_emb_dim: 256
+# total_emb_dim: 272
 cat_emb_dim: 16
-user_emb_dim: 32
+sub_emb_dim: 16
 d_backbone: 768
-# n_heads: 16
-# n_bilin: 8
 hist_len: 25
 st_hist_len: 25
 seq_len: 50
 p_dropout: 0.
 bias: False
-# make sure that this is the model that was used to create news embeddings
 backbone: 'sentence-transformers/all-mpnet-base-v2'
 
 # training:
-#num_workers: 2
 num_workers: 0
 n_negatives: 4
 batch_size: 64
@@ -54,19 +47,18 @@ ckpt_freq: 1
 device: 'cuda:0'
 lr: 0.0001
 # random_seed: 0
-# random_seed: 1 
-random_seed: 8
+# random_seed: 1
+random_seed: 12
 apply_sigmoid: False
 load_article_ids: False
-contrastive_temperature: 0.1
+contrastive_temperature: 0.08
 contrastive_lambda: 0.1
 
-  
 # logging:
 wandb: False
 mode: offline
 project: xnrs
-tags: [mind, standard, LSTUR]
-name: mind_small_LSTUR_2
+tags: [mind, naml]
+name: mind_small_naml_with_CL_2
 dir: /var/scratch/zta207/experiments
-notes: LSTUR model on mind small dataset
+notes: NAML model on MIND small dataset with full features

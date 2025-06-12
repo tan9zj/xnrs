@@ -2,7 +2,7 @@
 #SBATCH --job-name=tune_cl
 #SBATCH --output=logs/tune_cl_%j.out
 #SBATCH --error=logs/tune_cl_%j.err
-#SBATCH --time=72:00:00
+#SBATCH --time=99:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=32
 #SBATCH --gres=gpu:1
@@ -17,8 +17,8 @@ cd /home/zta207/xnrs
 mkdir -p config logs
 
 # grid search
-for temp in 0.06 0.08 0.1; do
-  for lamb in 0.005 0.01 0.02; do
+for temp in 0.08 0.1 0.09; do
+  for lamb in 0.01 0.012; do
     cfg_in=config/mind_small_CL.yml
     cfg_out=config/mind_small_CL_t${temp}_l${lamb}.yml
 
