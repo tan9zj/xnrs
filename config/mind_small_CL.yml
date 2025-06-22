@@ -15,9 +15,16 @@ min_hist_len: 1
 
 # model:
 model: 'standard'
-scoring: 'dot'
+# model: 'base'
+# model: 'mean'
+# scoring: 'dot'
+scoring: 'bilin'
 text_features: ['title_emb']
 catg_features: []  # ['category_index']
+# for new features 
+# text_features: ['title_emb', 'abstract_emb']
+# catg_features: ['category_index', 'subcategory_index']
+
 user_features: []  # ['user_index']
 add_features: []
 title_emb_dim: 256
@@ -47,9 +54,9 @@ test_freq: 1
 ckpt_freq: 1
 device: 'cuda:0'
 lr: 0.0001
-# random_seed: 0
+random_seed: 0   
 # random_seed: 1 
-random_seed: 12
+# random_seed: 12
 apply_sigmoid: False
 load_article_ids: False
 # contrastive_temperature: 0.1
@@ -67,7 +74,7 @@ wandb: False
 mode: offline
 project: xnrs
 tags: [mind, standard]
-name: mind_small_CL_catg_3
+name: mind_small_CL_theme_standard_bilin
 # name: mind_small_news
 dir: /var/scratch/zta207/experiments
 notes: test CL with theme, history with clicks

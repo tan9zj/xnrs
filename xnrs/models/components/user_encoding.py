@@ -23,28 +23,28 @@ class UserEncoder(nn.Module):
         self.pooler = pooler
         
         # for CL
-        # if head:
-        #     assert emb_dim is not None
-        #     # assert out_dim is not None
-        #     # self.head = nn.Linear(emb_dim, emb_dim, bias=False)
-        #     self.head = nn.Sequential(
-        #         nn.Linear(emb_dim, emb_dim, bias=bias),
-        #         activation,
-        #         nn.Linear(emb_dim, emb_dim, bias=bias)
-        #     )
-        # LSTUR NRMS NAML 
         if head:
             assert emb_dim is not None
-            assert out_dim is not None
+            # assert out_dim is not None
+            # self.head = nn.Linear(emb_dim, emb_dim, bias=False)
             self.head = nn.Sequential(
-                nn.Linear(emb_dim, out_dim, bias=bias),
+                nn.Linear(emb_dim, emb_dim, bias=bias),
                 activation,
-                nn.Linear(out_dim, out_dim, bias=bias)
+                nn.Linear(emb_dim, emb_dim, bias=bias)
             )
-            self.output_dim = out_dim
-        else:
-            self.head = nn.Identity()
-            self.output_dim = emb_dim
+        # LSTUR NRMS NAML 
+        # if head:
+        #     assert emb_dim is not None
+        #     assert out_dim is not None
+        #     self.head = nn.Sequential(
+        #         nn.Linear(emb_dim, out_dim, bias=bias),
+        #         activation,
+        #         nn.Linear(out_dim, out_dim, bias=bias)
+        #     )
+        #     self.output_dim = out_dim
+        # else:
+        #     self.head = nn.Identity()
+        #     self.output_dim = emb_dim
 
         
     def forward(

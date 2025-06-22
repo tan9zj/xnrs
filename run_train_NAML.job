@@ -2,7 +2,7 @@
 #SBATCH --job-name=train_NAML
 #SBATCH --output=train_mind_NAML_CL_%j.out
 #SBATCH --error=train_mind_NAML_CL_%j.err
-#SBATCH --time=10:00:00
+#SBATCH --time=99:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=32
 #SBATCH --gres=gpu:1

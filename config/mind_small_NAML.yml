@@ -46,9 +46,10 @@ test_freq: 1
 ckpt_freq: 1
 device: 'cuda:0'
 lr: 0.0001
-# random_seed: 0
+random_seed: 0
 # random_seed: 1
-random_seed: 12
+# random_seed: 12
+random_seed: 9
 apply_sigmoid: False
 load_article_ids: False
 contrastive_temperature: 0.08
@@ -59,6 +60,6 @@ wandb: False
 mode: offline
 project: xnrs
 tags: [mind, naml]
-name: mind_small_naml_with_CL_2
+name: mind_small_naml_with_CL_4
 dir: /var/scratch/zta207/experiments
 notes: NAML model on MIND small dataset with full features

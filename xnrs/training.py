@@ -409,6 +409,10 @@ class ContrastiveRankingTrainer(MSERankingTrainer):
         # for NAML
         if embeddings.dim() > 2:
             embeddings = embeddings.view(embeddings.size(0), -1)  # flatten if needed
+            
+        embeddings = nn.functional.normalize(embeddings, dim=-1)
+        
+        # embeddings = nn.functional.normalize(embeddings, dim=-1, eps=1e-6)
         
         sim_matrix = embeddings @ embeddings.mT
 
