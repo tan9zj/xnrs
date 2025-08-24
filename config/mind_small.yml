@@ -36,17 +36,18 @@ backbone: 'sentence-transformers/all-mpnet-base-v2'
 #num_workers: 2
 num_workers: 0
 n_negatives: 4
-batch_size: 64
+# batch_size: 64
+batch_size: 16
 shuffle_data: True
 n_epochs: 10
 test_freq: 1
 ckpt_freq: 1
 device: 'cuda:0'
 lr: 0.0001
-# random_seed: 0 
+random_seed: 0 
 # random_seed: 1
 # random_seed: 8
-random_seed: 12
+# random_seed: 12
 apply_sigmoid: False
 load_article_ids: False
 contrastive_temperature: 0.1
@@ -58,6 +59,6 @@ wandb: False
 mode: offline
 project: xnrs
 tags: [mind, standard]
-name: mind_small_baseline_2
+name: mind_small_xnrs_diversity
 dir: /var/scratch/zta207/experiments
 notes: standard model on mind small dataset

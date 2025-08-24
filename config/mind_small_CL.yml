@@ -17,8 +17,8 @@ min_hist_len: 1
 model: 'standard'
 # model: 'base'
 # model: 'mean'
-# scoring: 'dot'
-scoring: 'bilin'
+scoring: 'dot'
+# scoring: 'bilin'
 text_features: ['title_emb']
 catg_features: []  # ['category_index']
 # for new features 
@@ -45,7 +45,8 @@ backbone: 'sentence-transformers/all-mpnet-base-v2'
 #num_workers: 2
 num_workers: 0
 n_negatives: 4
-batch_size: 64
+# batch_size: 64
+batch_size: 16 # try to cut down size
 shuffle_data: True
 n_epochs: 10
 # n_epochs: 5
@@ -74,7 +75,7 @@ wandb: False
 mode: offline
 project: xnrs
 tags: [mind, standard]
-name: mind_small_CL_theme_standard_bilin
+name: mind_small_CL_theme_tsne
 # name: mind_small_news
 dir: /var/scratch/zta207/experiments
 notes: test CL with theme, history with clicks

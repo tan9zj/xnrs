@@ -17,4 +17,5 @@ module load cuda11.7/toolkit/11.7
 
 cd /home/zta207/xnrs
 
-python plot_CL_polar.py 
+# python plot_CL_polar.py 
+python plot_tsne.py

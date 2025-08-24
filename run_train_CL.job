@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=train_mind
-#SBATCH --output=test_CL_theme_standard_bilin_%j.out
-#SBATCH --error=test_CL_theme_standard_bilin_%j.err
+#SBATCH --output=test_CL_theme_tsne_%j.out
+#SBATCH --error=test_CL_theme_tsne_%j.err
 #SBATCH --time=24:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=32
 #SBATCH --gres=gpu:1
-#SBATCH --mem=32G
+#SBATCH --mem=60G
 #SBATCH --constraint=gpunode
 
 source /var/scratch/zta207/miniconda3/etc/profile.d/conda.sh

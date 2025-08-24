@@ -185,3 +185,20 @@ def plot_polar(data1, data2, labels=('User', 'News'), out_path='polar_plot.png')
     fig.savefig(out_path)
     plt.close(fig)
 
+from torch.utils.data._utils.collate import default_collate
+
+def custom_collate_fn(batch):
+    # 提取非tensor字段（如字符串、列表）避免stack
+    item_ids = [x['item_ids'] for x in batch]
+    user_index = [x['user_index'] for x in batch]
+
+    # 删除不适合 stack 的字段
+    for x in batch:
+        x.pop('item_ids', None)
+        x.pop('user_index', None)
+
+    # 默认方式 collate 剩下的 tensor 数据
+    collated = default_collate(batch)
+    collated['item_ids'] = item_ids
+    collated['user_index'] = user_index
+    return collated

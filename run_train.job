@@ -1,12 +1,14 @@
 #!/bin/bash
 #SBATCH --job-name=train_mind
-#SBATCH --output=train_mind_baseline_%j.out
-#SBATCH --error=train_mind_baseline_%j.err
-#SBATCH --time=10:00:00
+#SBATCH --output=train_mind_diversity_xnrs_%j.out
+#SBATCH --error=train_mind_diversity_xnrs_%j.err
+#SBATCH --time=24:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=32
 #SBATCH --gres=gpu:1
 #SBATCH --constraint=gpunode
+#SBATCH --mem=60G
+#SBATCH --nodelist=node002
 
 
 source /var/scratch/zta207/miniconda3/etc/profile.d/conda.sh

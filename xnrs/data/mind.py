@@ -180,6 +180,7 @@ class MindHandler:
         df = pd.read_csv(src_path, sep='\t', names=columns)
         return df
 
+    # remove_columns=['time', 'user', 'impression']
     @staticmethod
     def load_behaviors_as_hf_dataset(path, split, remove_columns=['time', 'user', 'impression'], num_proc: int = 1):
         ds = datasets.load_dataset('csv', data_files=path, split=split)

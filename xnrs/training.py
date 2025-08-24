@@ -13,10 +13,11 @@ from pandas import DataFrame
 import datetime
 from typing import Optional
 import pandas as pd
+import gc
 
 from .evaluation import metrics as eval
 from . import utils
-from .utils import batch_to_device, to_polar, plot_polar
+from .utils import batch_to_device, to_polar, plot_polar, custom_collate_fn
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 
@@ -54,7 +55,8 @@ class BaseTrainer(ABC):
             batch_size=self.cfg.batch_size,
             shuffle=self.cfg.shuffle_data,
             drop_last=True,
-            num_workers=self.cfg.num_workers
+            num_workers=self.cfg.num_workers,
+            collate_fn=custom_collate_fn
         )
         self.testloader = DataLoader(
             dataset=testset,
@@ -223,6 +225,20 @@ class RankingTrainer(BaseTrainer):
             'targets': t,
             'loss': loss
         }
+        
+        # user_index = batch['user_index']
+        # item_ids = batch['item_ids']
+        # if isinstance(item_ids, torch.Tensor):
+        #     item_ids = item_ids.cpu().tolist()
+
+        # sorted_indices = np.argsort(-s)
+        # ranked_item_ids = [item_ids[i] for i in sorted_indices]
+
+
+        # return_dict['user_index'] = user_index
+        # return_dict['item_ids'] = item_ids
+        # return_dict['ranked_item_ids'] = ranked_item_ids
+
         self._after_test_step(return_dict)
         return return_dict
 
@@ -285,6 +301,23 @@ class RankingTrainer(BaseTrainer):
         print(f'test loss: {epoch_loss:.4f}, ndcg@5: {epoch_ndcg5:.4f}, ndcg@10: {epoch_ndcg10:.4f}, '
                 f'mrr: {epoch_mrr:.4f}, ctr@1: {epoch_ctr1:.4f}, ctr@10: {epoch_ctr10:.4f}, '
                 f'auc: {epoch_auc:.4f}, acc: {epoch_acc:.4f}, rec: {epoch_rec:.4f}, prec: {epoch_prec:.4f}')
+        
+        # save（user_index, item_ids, scores）
+        # saving ranked item ids
+        # user_indices = [d['user_index'].cpu().item() if torch.is_tensor(d['user_index']) else d['user_index'] for d in results]
+        # ranked_lists = [' '.join([item[0] if isinstance(item, tuple) else str(item) for item in d['ranked_item_ids']]) for d in results]
+
+        
+        # if self.current_epoch == 3:
+        #     df = pd.DataFrame({
+        #     'user_index': user_indices,
+        #     'ranked_news': ranked_lists,
+        #     })
+            
+        #     out_path = os.path.join(self.cfg.dir, self.cfg.name, f'ranked_predictions_epoch_{self.current_epoch}.csv')
+        #     df.to_csv(out_path, index=False)
+        #     print(f"✅ Saved ranked predictions to {out_path}")
+
 
 
 
@@ -498,7 +531,7 @@ class ContrastiveRankingTrainer(MSERankingTrainer):
 
     def train(self):
         # TODO: evetually switch to logging and testing in step-wise periods?
-        # self._export_user_embeddings(stage='before_cl')
+        self._export_user_embeddings(stage='before_cl')
         
         for e in range(self.cfg.n_epochs):
             self.current_epoch = e
@@ -518,7 +551,7 @@ class ContrastiveRankingTrainer(MSERankingTrainer):
             last_train_results=train_results,
             last_test_results=test_results
         )
-        # self._export_user_embeddings(stage='after_cl')
+        self._export_user_embeddings(stage='after_cl')
 
         
     # def _after_test_iteration(self, results: list):

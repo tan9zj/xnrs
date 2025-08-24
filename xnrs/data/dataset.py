@@ -147,13 +147,16 @@ class NewsRecDataset(Dataset):
             targets = torch.FloatTensor([1] + [0] * self.n_neg).unsqueeze(1)
         elif self.mode == 'eval':
             targets = torch.FloatTensor([1] * len(positives) + [0] * len(negatives)).unsqueeze(1)
-
+            return_dict['item_ids'] = positives + negatives 
+            
         return_dict['targets'] = targets
 
         # add main_category into batch for CL
         return_dict['main_category'] = session['main_category']
         return_dict['main_theme'] = session['main_theme']
-
+        return_dict['user_index'] = int(session['user_index'])  #  int user index
+        return_dict['item_ids'] = positives + negatives     # candidate item ids
+        
         if return_news:  # for additional features
             return return_dict, hist_features, pos_features, neg_features
         else:
