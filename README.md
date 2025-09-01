@@ -11,7 +11,7 @@ Our results demonstrate the potential of contrastive learning to support more ba
 
  Our overall architecture can be seen in the figure below. 
 
- <img src="diagram" width="400"/>
+ <img src="diagram.png" width="400"/>
 
 
 ### Installation 
