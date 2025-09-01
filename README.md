@@ -38,8 +38,7 @@ This work extends the paper [*Explaining Neural News Recommendation with Attribu
 Please cite our paper:
 
 ```bibtex
-@article{
-    moeller24b,
+@article{Tang2025News,
     author = {Zijie Tang, Manel Slokom},
     title = {News, With a Twist: Using Contrastive Learning to Improve User Embeddings for Diverse News Recommendations},
     year = {2025},
