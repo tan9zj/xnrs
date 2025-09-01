@@ -9,16 +9,14 @@ We evaluate our approach on the MIND dataset, comparing against state-of-the-art
 Our results show that the proposed method achieves competitive accuracy and yields measurable improvements in beyond-accuracy objectives, particularly in content diversity and exposure fairness. 
 Our results demonstrate the potential of contrastive learning to support more balanced and responsible news recommendations.
 
+ Our overall architecture can be seen in the figure below. 
 
- <img src="schema.png" width="400"/>
+ <img src="diagram" width="400"/>
 
- Our explanations can be visiualized as below:
-
- <img src="example.png" width="700"/>
 
 ### Installation 
 
-To use this code, clone the repo, create a fresh python environment. 
+To use this code, clone the repo, and create a fresh Python environment. 
 Then inside the cloned directory, run:
 
 ```
